@@ -4,7 +4,7 @@
 # PACS: DCM4CHEE Arc Light 5
 # 
 # PERTAMA KALI:
-#   git clone https://github.com/rspawdevelopment-a11y/smart-ris-v3.git /opt/SmartRIS_V3
+#   git clone https://github.com/yudapw37/RIS-PACS.git /opt/SmartRIS_V3
 #   cd /opt/SmartRIS_V3
 #   cp .env.production.example .env.production
 #   nano .env.production   # <-- Sesuaikan IP, Password, dll

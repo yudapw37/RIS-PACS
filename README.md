@@ -114,8 +114,8 @@ SmartRIS_V3/
 ### 1. Clone & Setup
 
 ```bash
-git clone https://github.com/rspawdevelopment-a11y/smart-ris-v3.git
-cd smart-ris-v3
+git clone https://github.com/yudapw37/RIS-PACS.git
+cd RIS-PACS
 ```
 
 ### 2. Jalankan MySQL (dev)
@@ -251,7 +251,7 @@ docker compose version
 
 ```bash
 # Clone repository
-git clone https://github.com/rspawdevelopment-a11y/smart-ris-v3.git /opt/SmartRIS_V3
+git clone https://github.com/yudapw37/RIS-PACS.git /opt/SmartRIS_V3
 cd /opt/SmartRIS_V3
 
 # Copy & edit environment file
@@ -403,12 +403,26 @@ docker exec -i dcm4chee-db psql -U pacs pacsdb < backup_pacs_YYYYMMDD.sql
 
 ---
 
-## 📄 License
+## 📄 Lisensi
 
-Private — RSPaw Development
+Proyek ini dirilis di bawah lisensi **[MIT License](LICENSE)** — bebas digunakan, dipelajari, dimodifikasi, dan dikembangkan oleh siapa saja untuk kebutuhan penelitian, klinik, maupun rumah sakit.
+
+---
+
+## 💬 Dukungan & Layanan Teknis (Support)
+
+Jika Anda atau instansi/rumah sakit membutuhkan:
+- 🛠️ **Bantuan Setup, Instalasi & Integrasi (PACS DCM4CHEE / Modality / HIS)**
+- 🏥 **Kustomisasi Fitur & Modul Radiologi Khusus**
+- 🩺 **Dukungan Teknis & Konsultasi Sistem**
+
+Silakan hubungi:
+- 📱 **WhatsApp:** [Chat via WhatsApp](https://wa.me/) / DM
+- 🐙 **GitHub:** [@yudapw37](https://github.com/yudapw37)
+- 💡 **Diskusi & Masalah:** [GitHub Issues](https://github.com/yudapw37/RIS-PACS/issues)
 
 ---
 
 <p align="center">
-  <sub>SmartRIS V3 — Built with ❤️ for Indonesian Healthcare</sub>
+  <sub>SmartRIS V3 — Open Source Radiology Information System & PACS Viewer</sub>
 </p>
