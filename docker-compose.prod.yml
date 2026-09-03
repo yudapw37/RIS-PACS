@@ -1,0 +1,196 @@
+# ================================================================
+# SmartRIS V3 - Full Production Stack (DCM4CHEE PACS)
+# Usage: docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+# ================================================================
+
+services:
+  # ============================================
+  # 1. MySQL 8.0 - Database Utama SmartRIS
+  # ============================================
+  smartris-db:
+    image: mysql:8.0
+    container_name: smartris-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - smartris-db-data:/var/lib/mysql
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "${MYSQL_PORT:-33060}:3306"
+    command: --default-authentication-plugin=mysql_native_password --max_allowed_packet=256M --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - smartris-net
+
+  # ============================================
+  # 2. Backend - Bun / ElysiaJS API
+  # ============================================
+  smartris-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: smartris-backend:latest
+    container_name: smartris-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@smartris-db:3306/${MYSQL_DATABASE}"
+      PORT: 3000
+      NODE_ENV: production
+      DCM4CHEE_API_URL: "http://arc:8080"
+      DCM4CHEE_AET: "${DCM4CHEE_AET:-DCM4CHEE}"
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    depends_on:
+      smartris-db:
+        condition: service_healthy
+    networks:
+      - smartris-net
+
+  # ============================================
+  # 3. Frontend - Vue 3 + Nginx
+  # ============================================
+  smartris-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    image: smartris-frontend:latest
+    container_name: smartris-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      - smartris-backend
+    networks:
+      - smartris-net
+
+  # ============================================
+  # 4. OpenLDAP - Konfigurasi DICOM DCM4CHEE
+  # ============================================
+  ldap:
+    image: dcm4che/slapd-dcm4chee:2.6.10-34.2
+    container_name: dcm4chee-ldap
+    restart: unless-stopped
+    ports:
+      - "${LDAP_PORT:-389}:389"
+    environment:
+      LDAP_ROOTPASS: ${LDAP_ROOTPASS:-secret}
+      AE_TITLE: ${DCM4CHEE_AET:-DCM4CHEE}
+      DICOM_PORT: 11112
+      HL7_PORT: 2575
+      STORAGE_DIR: /storage/fs1
+    volumes:
+      - dcm4chee-ldap-data:/var/lib/openldap/openldap-data
+      - dcm4chee-slapd-config:/etc/openldap/slapd.d
+    networks:
+      - smartris-net
+
+  # ============================================
+  # 5. PostgreSQL 17 - Database DCM4CHEE PACS
+  # ============================================
+  dcm4chee-db:
+    image: dcm4che/postgres-dcm4chee:17.4-34
+    container_name: dcm4chee-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pacsdb
+      POSTGRES_USER: pacs
+      POSTGRES_PASSWORD: ${DCM4CHEE_DB_PASSWORD:-pacs}
+    volumes:
+      - dcm4chee-db-data:/var/lib/postgresql/data
+    ports:
+      - "${DCM4CHEE_PG_PORT:-15432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pacs -d pacsdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartris-net
+
+  # ============================================
+  # 6. DCM4CHEE Arc Light 5 - PACS Server
+  # ============================================
+  arc:
+    image: dcm4che/dcm4chee-arc-psql:5.34.2
+    container_name: dcm4chee-arc
+    hostname: arc
+    restart: unless-stopped
+    ports:
+      - "${DCM4CHEE_HTTP_PORT:-8082}:8080"      # Web UI + REST API
+      - "${DCM4CHEE_HTTPS_PORT:-8443}:8443"     # HTTPS
+      - "${WILDFLY_ADMIN_PORT:-9990}:9990"      # Wildfly Admin Console
+      - "${DICOM_PORT:-11112}:11112"            # DICOM
+      - "${DICOM_TLS_PORT:-2762}:2762"          # DICOM TLS
+      - "${HL7_PORT:-2575}:2575"                # HL7
+      - "${HL7_TLS_PORT:-12575}:12575"          # HL7 TLS
+    environment:
+      POSTGRES_DB: pacsdb
+      POSTGRES_USER: pacs
+      POSTGRES_PASSWORD: ${DCM4CHEE_DB_PASSWORD:-pacs}
+      POSTGRES_HOST: dcm4chee-db
+      WILDFLY_WAIT_FOR: "ldap:389 dcm4chee-db:5432"
+      WILDFLY_CHOWN: "/opt/wildfly/standalone /storage"
+    volumes:
+      - dcm4chee-wildfly:/opt/wildfly/standalone
+      - dcm4chee-storage:/storage
+    depends_on:
+      ldap:
+        condition: service_started
+      dcm4chee-db:
+        condition: service_healthy
+    networks:
+      - smartris-net
+
+  # ============================================
+  # 7. OHIF Viewer (OpenResty + Static Files)
+  # ============================================
+  ohif-viewer:
+    build:
+      context: ./ohif-viewer
+      dockerfile: Dockerfile
+    image: smartris-ohif-viewer:latest
+    container_name: ohif-viewer
+    restart: unless-stopped
+    ports:
+      - "${OHIF_PORT:-3001}:80"
+    depends_on:
+      - arc
+    networks:
+      - smartris-net
+
+# ============================================
+# Docker Volumes (Persistent Data)
+# ============================================
+volumes:
+  smartris-db-data:
+    name: smartris-v3-db-data
+  dcm4chee-ldap-data:
+    name: dcm4chee-ldap-data
+  dcm4chee-slapd-config:
+    name: dcm4chee-slapd-config
+  dcm4chee-db-data:
+    name: dcm4chee-db-data
+  dcm4chee-wildfly:
+    name: dcm4chee-wildfly
+  dcm4chee-storage:
+    name: dcm4chee-storage
+
+# ============================================
+# Docker Network
+# ============================================
+networks:
+  smartris-net:
+    driver: bridge
+    name: smartris-v3-net

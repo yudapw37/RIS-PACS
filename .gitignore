@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.production
+.env.local
+
+# Build output
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Docker volumes (local dev)
+data/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Drizzle
+drizzle/meta/
+
+# Frontend build cache
+frontend/package-lock.json

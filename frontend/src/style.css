@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #0b4b6f;
+  --color-primary-light: #1670a3;
+  --color-accent: #06b6d4;
+  --color-surface: #ffffff;
+  --color-surface-dark: #f8fafc;
+  --color-dark: #0f172a;
+}
+
+body {
+  font-family: 'Inter', 'Roboto', system-ui, sans-serif;
+  @apply bg-slate-50 text-slate-800 m-0 p-0 overflow-x-hidden transition-colors duration-300 dark:bg-slate-950 dark:text-slate-200;
+}
+
+/* Dark Mode Color Mapping Trick */
+.dark { color-scheme: dark; }
+
+/* ── UI Components ── */
+
+/* Premium Glassmorphism Class */
+.glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Buttons */
+.btn-primary { 
+  background: var(--color-primary); 
+  color: white; 
+  @apply px-5 py-2.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(11,75,111,0.25)] transition-all active:scale-95 duration-200;
+}
+.btn-primary:hover { opacity: 0.9; @apply -translate-y-0.5 shadow-[0_6px_20px_0_rgba(11,75,111,0.3)]; }
+
+.btn-secondary { 
+  @apply bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl font-semibold text-sm transition-all;
+}
+.btn-secondary:hover { @apply bg-slate-50 dark:bg-slate-800/50 -translate-y-0.5 shadow-sm; }
+
+.btn-cancel { 
+  @apply bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all;
+}
+.btn-cancel:hover { @apply bg-slate-100 dark:bg-slate-800; }
+
+.btn-danger { 
+  @apply bg-red-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-[0_4px_14px_0_rgba(239,68,68,0.25)];
+}
+.btn-danger:hover { @apply bg-red-600 -translate-y-0.5 shadow-[0_6px_20px_0_rgba(239,68,68,0.3)]; }
+
+/* Icon Buttons */
+.btn-icon-edit { 
+  @apply p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-500 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50 transition-all hover:scale-110;
+}
+.btn-icon-delete { 
+  @apply p-1.5 rounded-lg bg-red-50 dark:bg-red-900/40 text-red-500 dark:text-red-400 border border-red-100 dark:border-red-800/50 transition-all hover:scale-110;
+}
+
+/* Forms */
+.form-label { 
+  @apply block text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 px-1;
+}
+.form-input { 
+  @apply w-full bg-slate-50 dark:bg-slate-800/50 border-[1.5px] border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-400 dark:text-slate-100;
+}
+
+/* Badges */
+.badge-blue { @apply inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50; }
+.badge-pink { @apply inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-pink-50 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-800/50; }
+.badge-type { @apply inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700; }
+
+/* Modals */
+.modal-backdrop { 
+  @apply fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all;
+}
+.modal-box { 
+  @apply bg-white dark:bg-slate-900 rounded-[2rem] p-8 w-full max-w-xl shadow-2xl border border-white/20;
+}
+
+/* Toasts */
+.toast { 
+  @apply fixed bottom-8 right-8 flex items-center gap-3 px-5 py-3 rounded-2xl font-bold text-sm shadow-2xl z-[100] border;
+}
+.toast-success { @apply bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/50; }
+.toast-error { @apply bg-white dark:bg-slate-900 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/50; }
+
+/* Sidebar Navigation */
+.nav-group-label {
+    @apply text-[10px] font-[800] text-slate-400 dark:text-slate-500 uppercase tracking-[0.09em] mb-1.5 pl-2.5;
+}
+.nav-link {
+    @apply flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-semibold text-slate-600 dark:text-slate-400 no-underline transition-all duration-150;
+}
+.nav-link:hover {
+    @apply bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 translate-x-1;
+}
+.nav-active {
+    @apply !bg-cyan-50 dark:!bg-cyan-950/40 !text-cyan-700 dark:!text-cyan-400;
+}
+
+.nav-icon {
+    @apply shrink-0 text-slate-400 dark:text-slate-500 transition-colors duration-150;
+}
+.nav-link:hover .nav-icon {
+    @apply text-slate-500 dark:text-slate-400;
+}
+.nav-active .nav-icon {
+    @apply !text-cyan-600 dark:!text-cyan-500 !opacity-100;
+}
+
+/* Pagination */
+.pagination-btn {
+  @apply flex items-center justify-center w-9 h-9 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 transition-all shadow-sm;
+}
+.pagination-btn:hover:not(:disabled) {
+  @apply bg-slate-50 dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border-slate-300 dark:border-slate-600 -translate-y-0.5 shadow-md;
+}
+.pagination-btn:disabled {
+  @apply opacity-40 cursor-not-allowed bg-slate-50 dark:bg-slate-800/50 shadow-none;
+}
+
+/* ── Animations ── */
+.page-enter { animation: pageIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-enter-active, .modal-leave-active { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.modal-enter-from, .modal-leave-to { opacity: 0; transform: scale(0.9) translateY(20px); }
+
+.toast-enter-active, .toast-leave-active { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.toast-enter-from { opacity: 0; transform: translateX(50px); }
+.toast-leave-to { opacity: 0; transform: translateY(20px); }

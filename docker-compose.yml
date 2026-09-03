@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mysql_ris:
+    image: mysql:8.0
+    container_name: smartris_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ris_v3
+      MYSQL_USER: smartris_user
+      MYSQL_PASSWORD: smartris_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - smartris_net
+
+networks:
+  smartris_net:
+    driver: bridge
+
+volumes:
+  mysql_data:
