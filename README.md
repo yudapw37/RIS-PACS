@@ -417,8 +417,8 @@ Jika Anda atau instansi/rumah sakit membutuhkan:
 - 🩺 **Dukungan Teknis & Konsultasi Sistem**
 
 Silakan hubungi:
-- 📱 **WhatsApp:** [+62 857-7122-4422 (Chat via WhatsApp)](https://wa.me/6285771224422)
-- 🐙 **GitHub / DM:** [@yudapw37](https://github.com/yudapw37)
+- ✉️ **Email:** [yudapw37@gmail.com](mailto:yudapw37@gmail.com)
+- 🐙 **GitHub Profile:** [@yudapw37](https://github.com/yudapw37)
 - 💡 **Diskusi & Masalah:** [GitHub Issues](https://github.com/yudapw37/RIS-PACS/issues)
 
 ---
