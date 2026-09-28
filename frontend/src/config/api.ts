@@ -1,21 +1,8 @@
 import axios from 'axios'
 
 // Konfigurasi API terpusat untuk SmartRIS
-// Otomatis menyesuaikan dengan hostname yang diakses di browser (localhost / IP LAN) pada port 3000
-const getApiBase = () => {
-  if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location
-    // Jika ada environment variable custom yang valid dan bukan IP lama 192.168.103.70
-    const envUrl = import.meta.env.VITE_API_BASE_URL
-    if (envUrl && !envUrl.includes('192.168.103.70')) {
-      return envUrl
-    }
-    return `${protocol}//${hostname}:3000`
-  }
-  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
-}
-
-const API_BASE = getApiBase()
+// Mengambil URL Backend API murni dari environment (.env / .env.staging / .env.production)
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 
 // Mengkonfigurasi Axios secara global untuk FE
 axios.interceptors.request.use((config) => {
