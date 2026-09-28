@@ -6,6 +6,8 @@ export const patientRoutes = new Elysia({ prefix: "/api/patients" })
   .post("/", PatientController.createPatientHandler, {
     body: t.Object({
       mrn: t.String(),
+      nik: t.Optional(t.String()),
+      ihsNumber: t.Optional(t.String()),
       fullName: t.String(),
       dob: t.Optional(t.String()),
       gender: t.Optional(t.Union([t.Literal("L"), t.Literal("P")])),
