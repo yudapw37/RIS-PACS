@@ -25,6 +25,8 @@ export class PatientService {
   static async createPatient(data: any) {
     await db.insert(patients).values({
       mrn: data.mrn,
+      nik: data.nik || null,
+      ihsNumber: data.ihsNumber || null,
       fullName: data.fullName,
       dob: data.dob ? new Date(data.dob) : null,
       gender: data.gender,
@@ -42,6 +44,8 @@ export class PatientService {
     await db.update(patients)
       .set({
         mrn: data.mrn || undefined,
+        nik: data.nik !== undefined ? data.nik : undefined,
+        ihsNumber: data.ihsNumber !== undefined ? data.ihsNumber : undefined,
         fullName: data.fullName || undefined,
         dob: data.dob ? new Date(data.dob) : undefined,
         gender: data.gender || undefined,

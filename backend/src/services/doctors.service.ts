@@ -16,6 +16,8 @@ export class DoctorService {
     await db.insert(doctors).values({
       userId: data.userId || null,
       nip: data.nip || null,
+      nik: data.nik || null,
+      ihsNumber: data.ihsNumber || null,
       fullName: data.fullName,
       specialization: data.specialization || null,
       department: data.department || null
@@ -28,6 +30,8 @@ export class DoctorService {
       .set({
         userId: data.userId || undefined,
         nip: data.nip || undefined,
+        nik: data.nik !== undefined ? data.nik : undefined,
+        ihsNumber: data.ihsNumber !== undefined ? data.ihsNumber : undefined,
         fullName: data.fullName || undefined,
         specialization: data.specialization || undefined,
         department: data.department || undefined

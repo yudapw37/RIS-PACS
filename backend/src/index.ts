@@ -7,8 +7,10 @@ import { authRoutes } from "./routes/auth";
 import { doctorRoutes } from "./routes/doctors";
 import { reportRoutes } from "./routes/reports";
 import { systemRoutes } from "./routes/system";
+import { satusehatRoutes } from "./routes/satusehat";
 import { authMiddleware } from "./middleware/auth.middleware";
 import { OrderController } from "./controllers/orders.controller";
+import { SatusehatController } from "./controllers/satusehat.controller";
 import { runMigrations } from "./db/migrate";
 
 // Jalankan migrasi database saat startup
@@ -21,6 +23,8 @@ const app = new Elysia()
   // Endpoint internal untuk DCM4CHEE MWL Bridge (server-to-server, tanpa JWT)
   // DCM4CHEE memiliki built-in MWL SCP, endpoint ini sebagai fallback/debugging
   .get("/api/orders/dicom-worklist", OrderController.getDicomWorklistHandler)
+  // Webhook Event-Driven DICOM Router (dipanggil DCM4CHEE saat study baru diterima)
+  .post("/api/webhooks/dcm4chee/study-received", SatusehatController.dicomWebhookHandler)
   // ── Protected routes (requires valid JWT Token) ──
   .use(authMiddleware)
   .use(doctorRoutes)
@@ -29,6 +33,7 @@ const app = new Elysia()
   .use(orderRoutes)
   .use(reportRoutes)
   .use(systemRoutes)
+  .use(satusehatRoutes)
   .get("/", () => {
     return {
       status: "alive",

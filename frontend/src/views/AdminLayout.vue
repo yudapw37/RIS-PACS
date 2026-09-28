@@ -114,6 +114,17 @@
           </div>
         </div>
 
+        <!-- Group: Interoperabilitas -->
+        <div>
+          <p class="nav-group-label">Interoperabilitas</p>
+          <div class="space-y-1">
+            <router-link to="/admin/satusehat" active-class="nav-active" class="nav-link group">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon text-teal-500"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>SATUSEHAT Gateway</span>
+            </router-link>
+          </div>
+        </div>
+
         <!-- Group: Sistem -->
         <div>
           <p class="nav-group-label">Sistem</p>

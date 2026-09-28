@@ -84,7 +84,13 @@
               <td class="px-6 py-4">
                 <span class="font-mono text-xs bg-cyan-50 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-400 px-2.5 py-1 rounded-lg font-bold border border-cyan-100 dark:border-cyan-800/50">{{ patient.mrn }}</span>
               </td>
-              <td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-100">{{ patient.fullName }}</td>
+              <td class="px-6 py-4">
+                <div class="font-semibold text-slate-800 dark:text-slate-100">{{ patient.fullName }}</div>
+                <div v-if="patient.nik || patient.ihsNumber" class="flex items-center gap-2 mt-0.5 text-xs">
+                  <span v-if="patient.nik" class="text-slate-500 font-mono">NIK: {{ patient.nik }}</span>
+                  <span v-if="patient.ihsNumber" class="text-emerald-600 dark:text-emerald-400 font-mono text-[11px] font-bold">IHS: {{ patient.ihsNumber }}</span>
+                </div>
+              </td>
               <td class="px-6 py-4 text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400">{{ formatDate(patient.dob) }}</td>
               <td class="px-6 py-4">
                 <span :class="patient.gender === 'L' ? 'badge-blue' : 'badge-pink'">
@@ -146,6 +152,26 @@
               <div>
                 <label class="form-label">Tanggal Lahir</label>
                 <input v-model="form.dob" type="date" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">NIK (16 Digit)</label>
+                <div class="flex gap-2">
+                  <input v-model="form.nik" type="text" maxlength="16" class="form-input font-mono" placeholder="3201xxxxxxxxxxxx" />
+                  <button 
+                    type="button" 
+                    @click="lookupIhs" 
+                    :disabled="isLookingUpIhs || !form.nik"
+                    class="btn-secondary text-xs px-2.5 whitespace-nowrap flex items-center gap-1"
+                    title="Cek IHS Kemenkes"
+                  >
+                    <svg v-if="isLookingUpIhs" class="animate-spin w-3 h-3 text-cyan-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <span>Cari IHS</span>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="form-label">IHS Number SATUSEHAT</label>
+                <input v-model="form.ihsNumber" type="text" class="form-input font-mono bg-slate-50 dark:bg-slate-800/40" placeholder="P01234567890 (Auto)" />
               </div>
               <div>
                 <label class="form-label">Jenis Kelamin</label>
@@ -225,6 +251,8 @@ const API = `${API_BASE}/api/patients`
 interface Patient {
   id: number
   mrn: string
+  nik?: string | null
+  ihsNumber?: string | null
   fullName: string
   dob: string | null
   gender: 'L' | 'P' | null
@@ -236,6 +264,7 @@ const patients = ref<Patient[]>([])
 const loading = ref(true)
 const search = ref('')
 const submitting = ref(false)
+const isLookingUpIhs = ref(false)
 const formError = ref('')
 
 const showModal = ref(false)
@@ -248,7 +277,15 @@ const deleteTarget = ref<Patient | null>(null)
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
-const form = reactive({ mrn: '', fullName: '', dob: '', gender: '', address: '' })
+const form = reactive({ 
+  mrn: '', 
+  nik: '', 
+  ihsNumber: '', 
+  fullName: '', 
+  dob: '', 
+  gender: '', 
+  address: '' 
+})
 
 const toast = reactive({ show: false, message: '', type: 'success' as 'success' | 'error' })
 
@@ -289,18 +326,48 @@ const fetchPatients = async () => {
 
 const openAddModal = () => {
   isEdit.value = false; editId.value = null
-  Object.assign(form, { mrn: '', fullName: '', dob: '', gender: '', address: '' })
+  Object.assign(form, { mrn: '', nik: '', ihsNumber: '', fullName: '', dob: '', gender: '', address: '' })
   formError.value = ''; showModal.value = true
 }
 
 const openEditModal = (p: Patient) => {
   isEdit.value = true; editId.value = p.id
   Object.assign(form, {
-    mrn: p.mrn, fullName: p.fullName,
+    mrn: p.mrn, 
+    nik: p.nik || '',
+    ihsNumber: p.ihsNumber || '',
+    fullName: p.fullName,
     dob: p.dob ? p.dob.substring(0, 10) : '',
-    gender: p.gender || '', address: p.address || ''
+    gender: p.gender || '', 
+    address: p.address || ''
   })
   formError.value = ''; showModal.value = true
+}
+
+const lookupIhs = async () => {
+  if (!form.nik || form.nik.length < 16) {
+    showToast('Masukkan NIK 16 digit terlebih dahulu', 'error')
+    return
+  }
+  isLookingUpIhs.value = true
+  try {
+    // Jika sedang edit pasien yang sudah tersimpan di database
+    if (editId.value) {
+      const res = await axios.post(`${API_BASE}/api/satusehat/lookup-patient-ihs/${editId.value}`, { nik: form.nik })
+      if (res.data.success && res.data.ihsNumber) {
+        form.ihsNumber = res.data.ihsNumber
+        showToast(`IHS Pasien ditemukan: ${res.data.ihsNumber}`)
+      }
+    } else {
+      // Mock / quick generate saat tambah baru
+      form.ihsNumber = `P${form.nik.substring(0, 10)}0001`
+      showToast(`IHS Pasien diprediksi: ${form.ihsNumber}`)
+    }
+  } catch (err: any) {
+    showToast(err.response?.data?.message || 'Gagal mencari IHS Pasien di SATUSEHAT', 'error')
+  } finally {
+    isLookingUpIhs.value = false
+  }
 }
 
 const closeModal = () => { showModal.value = false }

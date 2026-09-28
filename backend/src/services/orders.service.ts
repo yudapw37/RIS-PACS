@@ -2,6 +2,7 @@ import { db } from "../db";
 import { orders, patients, doctors, modalities, modalityTypes, expertise } from "../db/schema";
 import { eq, inArray, desc, or, and, isNull, isNotNull } from "drizzle-orm";
 import { DCM4CHEEService } from "./dcm4chee.service";
+import { SatusehatService } from "./satusehat.service";
 
 export class OrderService {
   // 0. Get ALL Orders (semua status, untuk Manajemen Order)
@@ -17,9 +18,15 @@ export class OrderService {
       priority: orders.priority,
       status: orders.status,
       orderDate: orders.orderDate,
+      studyInstanceUid: orders.studyInstanceUid,
+      satusehatStatus: orders.satusehatStatus,
+      satusehatStudyId: orders.satusehatStudyId,
+      satusehatReportId: orders.satusehatReportId,
       patient: {
         mrn: patients.mrn,
         fullName: patients.fullName,
+        nik: patients.nik,
+        ihsNumber: patients.ihsNumber,
         gender: patients.gender,
         dob: patients.dob,
       },
@@ -317,9 +324,15 @@ export class OrderService {
       priority: orders.priority,
       status: orders.status,
       orderDate: orders.orderDate,
+      studyInstanceUid: orders.studyInstanceUid,
+      satusehatStatus: orders.satusehatStatus,
+      satusehatStudyId: orders.satusehatStudyId,
+      satusehatReportId: orders.satusehatReportId,
       patient: {
         mrn: patients.mrn,
         fullName: patients.fullName,
+        nik: patients.nik,
+        ihsNumber: patients.ihsNumber,
         gender: patients.gender,
         dob: patients.dob,
         address: patients.address
@@ -374,6 +387,16 @@ export class OrderService {
         findings: data.findings,
         conclusions: data.conclusions
       });
+      
+      // Auto-sync ke SATUSEHAT jika diaktifkan di konfigurasi
+      SatusehatService.getSettings().then(settings => {
+        if (settings.autoSyncOnExpertise === "yes") {
+          SatusehatService.pushOrderToSatusehat(orderId)
+            .then(res => console.log(`🚀 [SATUSEHAT Auto-Sync] Order ${orderId}: ${res.message}`))
+            .catch(err => console.warn(`⚠️ [SATUSEHAT Auto-Sync] Gagal: ${err.message}`));
+        }
+      }).catch(() => {});
+
       return { success: true, message: "Expertise berhasil disimpan" };
     }
   }

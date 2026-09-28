@@ -25,6 +25,8 @@ export const doctors = mysqlTable("doctors", {
   id: serial("id").primaryKey(),
   userId: bigint("user_id", { mode: "number", unsigned: true }).references(() => users.id), // Link ke user auth (bila dokter berhak login ke sistem RIS)
   nip: varchar("nip", { length: 50 }).unique(), // NIP / Nomor Induk Pegawai Dokter
+  nik: varchar("nik", { length: 20 }), // NIK KTP Dokter (untuk sinkronisasi IHS Practitioner SATUSEHAT)
+  ihsNumber: varchar("ihs_number", { length: 50 }), // IHS Practitioner ID dari SATUSEHAT (cth: 10000000001)
   fullName: varchar("full_name", { length: 255 }).notNull(),
   specialization: varchar("specialization", { length: 150 }), // cth: Spesialis Radiologi, THT, Dokter Umum
   department: varchar("department", { length: 150 }), // [Tahap 2] Unit/Departemen (cth: Poli Gigi, IGD, Rawat Inap)
@@ -35,6 +37,8 @@ export const doctors = mysqlTable("doctors", {
 export const patients = mysqlTable("patients", {
   id: serial("id").primaryKey(),
   mrn: varchar("mrn", { length: 50 }).notNull().unique(), // Medical Record Number (Patient ID dalam DICOM)
+  nik: varchar("nik", { length: 20 }), // NIK Pasien (wajib untuk lookup IHS Patient SATUSEHAT)
+  ihsNumber: varchar("ihs_number", { length: 50 }), // IHS Number dari SATUSEHAT Kemenkes (cth: P01234567890)
   fullName: varchar("full_name", { length: 255 }).notNull(),
   dob: date("dob"), // Tanggal Lahir (Date of Birth)
   gender: mysqlEnum("gender", ["L", "P"]), // Laki-laki / Perempuan
@@ -87,6 +91,11 @@ export const orders = mysqlTable("orders", {
   radiographerId: bigint("radiographer_id", { mode: "number", unsigned: true }).references(() => users.id), // Teknisi/radiografer yang melakukan
   examStartedAt: timestamp("exam_started_at"),   // Waktu mulai diperiksa
   examFinishedAt: timestamp("exam_finished_at"), // Waktu selesai diperiksa
+  // [SATUSEHAT DICOM Gateway Integration]
+  studyInstanceUid: varchar("study_instance_uid", { length: 128 }), // UID Study DICOM dari DCM4CHEE
+  satusehatStatus: mysqlEnum("satusehat_status", ["unmapped", "pending", "synced", "failed"]).default("unmapped"),
+  satusehatStudyId: varchar("satusehat_study_id", { length: 100 }), // ID FHIR ImagingStudy Kemenkes
+  satusehatReportId: varchar("satusehat_report_id", { length: 100 }), // ID FHIR DiagnosticReport Kemenkes
 });
 
 // 5. Medical Expertise / Hasil Bacaan
@@ -97,4 +106,44 @@ export const expertise = mysqlTable("expertise", {
   findings: text("findings"), // Temuan/Details bacaan
   conclusions: text("conclusions"), // Kesimpulan/Kesan
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// 6. SATUSEHAT Audit Log & Transaction Queue (Monitoring & Outbox)
+export const satusehatLogs = mysqlTable("satusehat_logs", {
+  id: serial("id").primaryKey(),
+  orderId: bigint("order_id", { mode: "number", unsigned: true }).references(() => orders.id),
+  patientId: bigint("patient_id", { mode: "number", unsigned: true }).references(() => patients.id),
+  resourceType: mysqlEnum("resource_type", [
+    "Patient",
+    "Practitioner",
+    "ServiceRequest",
+    "ImagingStudy",
+    "DiagnosticReport",
+    "Encounter",
+    "Auth"
+  ]).notNull(),
+  action: varchar("action", { length: 100 }).notNull(), // cth: "PUSH_IMAGING_STUDY", "PUSH_DIAGNOSTIC_REPORT", "LOOKUP_PATIENT_IHS"
+  status: mysqlEnum("status", ["pending", "success", "failed"]).notNull(),
+  satusehatId: varchar("satusehat_id", { length: 100 }), // ID Resource hasil submit
+  httpStatus: int("http_status"),
+  requestPayload: json("request_payload"),
+  responsePayload: json("response_payload"),
+  errorMessage: text("error_message"),
+  retryCount: int("retry_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// 7. SATUSEHAT Gateway Configuration Settings
+export const satusehatSettings = mysqlTable("satusehat_settings", {
+  id: serial("id").primaryKey(),
+  organizationId: varchar("organization_id", { length: 100 }).notNull().default("10000004"), // ID Faskes Kemenkes DTO
+  clientId: varchar("client_id", { length: 255 }).default(""),
+  clientSecret: varchar("client_secret", { length: 255 }).default(""),
+  environment: mysqlEnum("environment", ["sandbox", "staging", "production"]).default("staging"),
+  authUrl: varchar("auth_url", { length: 255 }).default("https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1"),
+  baseUrl: varchar("base_url", { length: 255 }).default("https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1"),
+  autoSyncOnExpertise: mysqlEnum("auto_sync_on_expertise", ["yes", "no"]).default("yes"),
+  simulationMode: mysqlEnum("simulation_mode", ["yes", "no"]).default("yes"), // Mode simulasi untuk demo/testing tanpa auth live
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
