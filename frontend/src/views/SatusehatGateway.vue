@@ -587,8 +587,8 @@
 
     <!-- ── MODAL JSON PAYLOAD INSPECTOR ── -->
     <Transition name="modal">
-      <div v-if="selectedLog" class="modal-backdrop" @click.self="selectedLog = null">
-        <div class="modal-box max-w-6xl w-full h-[88vh] flex flex-col p-6">
+      <div v-if="selectedLog" class="modal-backdrop !p-2 sm:!p-4" @click.self="selectedLog = null">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 w-[96vw] max-w-[1600px] h-[92vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
           
           <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div>
