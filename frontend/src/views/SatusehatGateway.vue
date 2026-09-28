@@ -570,7 +570,18 @@
             </p>
           </div>
 
-          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button 
+              type="button" 
+              @click="testConnection"
+              :disabled="isTestingAuth" 
+              class="btn-secondary flex items-center gap-2 text-xs py-2 px-4 font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800/60 bg-cyan-50/50 dark:bg-cyan-950/20 hover:bg-cyan-100 dark:hover:bg-cyan-900/30"
+            >
+              <svg v-if="isTestingAuth" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+              {{ isTestingAuth ? 'Menguji Koneksi...' : 'Uji Koneksi SATUSEHAT' }}
+            </button>
+
             <button 
               type="submit" 
               :disabled="isSavingSettings" 
