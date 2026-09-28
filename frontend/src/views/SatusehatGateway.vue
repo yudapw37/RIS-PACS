@@ -588,14 +588,24 @@
     <!-- ── MODAL JSON PAYLOAD INSPECTOR ── -->
     <Transition name="modal">
       <div v-if="selectedLog" class="modal-backdrop" @click.self="selectedLog = null">
-        <div class="modal-box max-w-3xl max-h-[85vh] flex flex-col p-6">
+        <div class="modal-box max-w-6xl w-full h-[88vh] flex flex-col p-6">
           
-          <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div>
               <h3 class="text-lg font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <span>Inspector Payload SATUSEHAT</span>
                 <span class="text-xs px-2 py-0.5 rounded font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                   #{{ selectedLog.id }}
+                </span>
+                <span 
+                  :class="[
+                    'px-2.5 py-0.5 rounded-full text-xs font-bold',
+                    selectedLog.status === 'success' 
+                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400' 
+                      : 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
+                  ]"
+                >
+                  {{ selectedLog.status === 'success' ? 'Sukses' : 'Gagal' }}
                 </span>
               </h3>
               <p class="text-xs text-slate-400 mt-0.5">
@@ -607,40 +617,48 @@
             </button>
           </div>
 
-          <div class="flex-1 overflow-y-auto py-4 space-y-4">
+          <!-- Error Alert if exists -->
+          <div v-if="selectedLog.errorMessage" class="mt-3 p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs shrink-0">
+            <span class="font-bold">Error Detail:</span> <span class="font-mono ml-1">{{ selectedLog.errorMessage }}</span>
+          </div>
+
+          <!-- Kiri & Kanan Container (Side-by-Side 2 Columns) -->
+          <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
             
-            <!-- Request Payload -->
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Request JSON (Dikirim)</span>
-                <button @click="copyText(JSON.stringify(selectedLog.requestPayload, null, 2))" class="text-xs text-cyan-600 hover:underline">
+            <!-- Kolom Kiri: Request Payload -->
+            <div class="flex flex-col h-full overflow-hidden border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-900">
+              <div class="flex items-center justify-between px-4 py-2.5 bg-slate-800/80 border-b border-slate-700/60 shrink-0">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                  Request JSON (Dikirim)
+                </span>
+                <button @click="copyText(JSON.stringify(selectedLog.requestPayload, null, 2))" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                   Salin JSON
                 </button>
               </div>
-              <pre class="bg-slate-900 text-slate-100 p-4 rounded-2xl text-xs font-mono overflow-x-auto max-h-56 leading-relaxed select-all">{{ JSON.stringify(selectedLog.requestPayload, null, 2) || '// Tidak ada request payload' }}</pre>
+              <pre class="flex-1 p-4 text-slate-100 text-xs font-mono overflow-y-auto leading-relaxed select-all">{{ JSON.stringify(selectedLog.requestPayload, null, 2) || '// Tidak ada request payload' }}</pre>
             </div>
 
-            <!-- Response Payload -->
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Response JSON (Dari SATUSEHAT)</span>
-                <button @click="copyText(JSON.stringify(selectedLog.responsePayload, null, 2))" class="text-xs text-cyan-600 hover:underline">
+            <!-- Kolom Kanan: Response Payload -->
+            <div class="flex flex-col h-full overflow-hidden border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-900">
+              <div class="flex items-center justify-between px-4 py-2.5 bg-slate-800/80 border-b border-slate-700/60 shrink-0">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  Response JSON (Dari SATUSEHAT)
+                </span>
+                <button @click="copyText(JSON.stringify(selectedLog.responsePayload, null, 2))" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                   Salin JSON
                 </button>
               </div>
-              <pre class="bg-slate-900 text-emerald-300 p-4 rounded-2xl text-xs font-mono overflow-x-auto max-h-56 leading-relaxed select-all">{{ JSON.stringify(selectedLog.responsePayload, null, 2) || '// Tidak ada response payload' }}</pre>
-            </div>
-
-            <!-- Error Message if failed -->
-            <div v-if="selectedLog.errorMessage" class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs">
-              <p class="font-bold">Error Detail:</p>
-              <p class="mt-1 font-mono">{{ selectedLog.errorMessage }}</p>
+              <pre class="flex-1 p-4 text-emerald-300 text-xs font-mono overflow-y-auto leading-relaxed select-all">{{ JSON.stringify(selectedLog.responsePayload, null, 2) || '// Tidak ada response payload' }}</pre>
             </div>
 
           </div>
 
-          <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-            <button @click="selectedLog = null" class="btn-cancel text-xs">Tutup</button>
+          <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end shrink-0 mt-3">
+            <button @click="selectedLog = null" class="btn-cancel text-xs px-5">Tutup</button>
           </div>
 
         </div>
