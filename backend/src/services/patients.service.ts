@@ -23,6 +23,25 @@ export class PatientService {
   }
 
   static async createPatient(data: any) {
+    // 1. Cek apakah Nomor Rekam Medis (MRN) sudah pernah didaftarkan
+    const existing = await db.select().from(patients).where(eq(patients.mrn, data.mrn)).limit(1);
+    if (existing.length > 0) {
+      const p = existing[0];
+      const err: any = new Error(`Nomor Rekam Medis (MRN) '${data.mrn}' sudah terdaftar atas nama '${p.fullName}' (ID Pasien: ${p.id}).`);
+      err.code = "ER_DUP_ENTRY";
+      err.duplicateField = "mrn";
+      err.duplicateValue = data.mrn;
+      err.existingPatient = {
+        id: p.id,
+        mrn: p.mrn,
+        fullName: p.fullName,
+        nik: p.nik,
+        gender: p.gender,
+        dob: p.dob
+      };
+      throw err;
+    }
+
     let normalizedGender: "L" | "P" | null = null;
     if (data.gender) {
       const g = String(data.gender).trim().toUpperCase();

@@ -251,6 +251,16 @@ export class OrderService {
         const rand = Math.floor(1000 + Math.random() * 9000);
         const yyyymmdd = date.toISOString().split('T')[0].replace(/-/g, '');
         data.accessionNumber = `ACC-${yyyymmdd}-${rand}`;
+    } else {
+        // Cek duplikasi nomor Accession
+        const existingAcc = await db.select().from(orders).where(eq(orders.accessionNumber, data.accessionNumber)).limit(1);
+        if (existingAcc.length > 0) {
+          const err: any = new Error(`Nomor Accession '${data.accessionNumber}' sudah pernah digunakan oleh pemeriksaan Order #${existingAcc[0].id}.`);
+          err.code = "ER_DUP_ENTRY";
+          err.duplicateField = "accessionNumber";
+          err.duplicateValue = data.accessionNumber;
+          throw err;
+        }
     }
     
     // Insert ke MySQL

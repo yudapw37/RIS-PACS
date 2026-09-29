@@ -74,6 +74,14 @@ export class OrderController {
       
       return sendResponse(set, 201, "Jadwal order berhasil diciptakan", output);
     } catch (err: any) {
+      if (err.code === "ER_DUP_ENTRY" || err.message?.includes("Duplicate entry") || err.message?.includes("ER_DUP_ENTRY")) {
+        return sendResponse(set, 409, err.message || `Nomor Accession '${body.accessionNumber}' sudah pernah digunakan.`, {
+          status: "DUPLICATE_ENTRY",
+          field: "accessionNumber",
+          value: body.accessionNumber,
+          solution: "Nomor Accession Number harus bersifat unik. Silakan gunakan nomor baru atau kosongkan nilai accessionNumber agar sistem membuatkannya secara otomatis."
+        });
+      }
       return sendResponse(set, 400, "Gagal membuat jadwal radiologi", { error: err.message });
     }
   }

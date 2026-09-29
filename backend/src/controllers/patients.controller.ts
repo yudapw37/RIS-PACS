@@ -20,6 +20,15 @@ export class PatientController {
       const result = await PatientService.createPatient(body);
       return sendResponse(set, 201, "Data pasien berhasil disimpan", result);
     } catch (err: any) {
+      if (err.code === "ER_DUP_ENTRY" || err.message?.includes("Duplicate entry") || err.message?.includes("ER_DUP_ENTRY")) {
+        return sendResponse(set, 409, err.message || `Pasien dengan Nomor Rekam Medis (MRN) '${body.mrn}' sudah terdaftar.`, {
+          status: "DUPLICATE_ENTRY",
+          field: "mrn",
+          value: body.mrn,
+          existingPatient: err.existingPatient || undefined,
+          solution: `Pasien dengan MRN '${body.mrn}' sudah ada di database SmartRIS. Gunakan nomor MRN baru untuk pasien lain, atau gunakan endpoint PUT /api/patients/${err.existingPatient?.id || ':id'} jika ingin memperbarui data pasien ini.`
+        });
+      }
       return sendResponse(set, 400, "Gagal menyimpan pasien", { error: err.message });
     }
   }
