@@ -870,6 +870,14 @@ export class SatusehatService {
   static async pushOrderToSatusehat(orderId: number): Promise<SatusehatPushResult> {
     const logIds: number[] = [];
 
+    if (!orderId || isNaN(orderId)) {
+      return {
+        success: false,
+        message: "ID Order tidak valid atau kosong.",
+        logIds: [],
+      };
+    }
+
     // Tandai status order sedang diproses
     await db.update(orders)
       .set({ satusehatStatus: "pending" })

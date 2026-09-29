@@ -61,7 +61,12 @@ export class SatusehatController {
    */
   static async pushOrderHandler({ params: { orderId }, set }: any) {
     try {
-      const result = await SatusehatService.pushOrderToSatusehat(Number(orderId));
+      const id = Number(orderId);
+      if (!id || isNaN(id)) {
+        set.status = 400;
+        return { success: false, message: "ID Order tidak valid atau kosong." };
+      }
+      const result = await SatusehatService.pushOrderToSatusehat(id);
       if (!result.success) {
         set.status = 400;
       }

@@ -789,7 +789,11 @@ const fetchOrders = async () => {
   loadingOrders.value = true
   try {
     const res = await axios.get(`${API_BASE}/api/orders/all`)
-    ordersList.value = res.data
+    ordersList.value = Array.isArray(res.data?.data) 
+      ? res.data.data 
+      : Array.isArray(res.data) 
+      ? res.data 
+      : []
   } catch (err: any) {
     showToast('Gagal memuat antrean order', 'error')
   } finally {
@@ -818,6 +822,10 @@ const refreshAll = () => {
 
 // ── ACTIONS ──
 const pushOrder = async (orderId: number) => {
+  if (!orderId || isNaN(orderId)) {
+    showToast('ID Order tidak valid', 'error')
+    return
+  }
   pushingOrderId.value = orderId
   try {
     const res = await axios.post(`${API_BASE}/api/satusehat/push-order/${orderId}`)
