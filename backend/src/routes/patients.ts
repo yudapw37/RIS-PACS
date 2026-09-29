@@ -10,8 +10,14 @@ export const patientRoutes = new Elysia({ prefix: "/api/patients" })
       ihsNumber: t.Optional(t.String()),
       fullName: t.String(),
       dob: t.Optional(t.String()),
-      gender: t.Optional(t.Union([t.Literal("L"), t.Literal("P")])),
-      address: t.Optional(t.String())
+      birthDate: t.Optional(t.String()),
+      gender: t.Optional(t.Union([
+        t.Literal("L"), t.Literal("P"),
+        t.Literal("male"), t.Literal("female"),
+        t.Literal("M"), t.Literal("F")
+      ])),
+      address: t.Optional(t.String()),
+      phone: t.Optional(t.String())
     })
   })
   .get("/:id", PatientController.getPatientByIdHandler)

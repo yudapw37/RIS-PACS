@@ -61,14 +61,15 @@ export class OrderController {
     try {
       const output = await OrderService.createOrder({
         patientId: body.patientId,
-        noReg: body.noReg,
+        noReg: body.noReg || `REG-${Date.now()}`,
         doctorId: body.doctorId || null,
         accessionNumber: body.accessionNumber || "", // Service will regenerate if empty
         modalityTypeCode: body.modalityTypeCode,
         modalityId: body.modalityId || null,
         bodyPart: body.bodyPart || null,
-        clinicalInfo: body.clinicalInfo || null,
-        priority: body.priority || "routine",
+        clinicalInfo: body.clinicalInfo || body.clinicalNotes || null,
+        priority: (body.priority ? String(body.priority).toLowerCase() : "routine") as any,
+        satusehatServiceRequestId: body.satusehat_service_request_id || body.satusehatServiceRequestId || null
       });
       
       return sendResponse(set, 201, "Jadwal order berhasil diciptakan", output);

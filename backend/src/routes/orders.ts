@@ -27,14 +27,20 @@ export const orderRoutes = new Elysia({ prefix: "/api/orders" })
   .post("/", OrderController.createOrderHandler, {
     body: t.Object({
       patientId: t.Number(),
-      noReg: t.String(),
+      noReg: t.Optional(t.String()),
       doctorId: t.Optional(t.Number()),
       accessionNumber: t.Optional(t.String()),
       modalityTypeCode: t.String(),
       modalityId: t.Optional(t.Number()),
       bodyPart: t.Optional(t.String()),
       clinicalInfo: t.Optional(t.String()),
-      priority: t.Optional(t.Union([t.Literal("routine"), t.Literal("urgent"), t.Literal("stat")]))
+      clinicalNotes: t.Optional(t.String()),
+      priority: t.Optional(t.Union([
+        t.Literal("routine"), t.Literal("urgent"), t.Literal("stat"),
+        t.Literal("ROUTINE"), t.Literal("URGENT"), t.Literal("STAT")
+      ])),
+      satusehat_service_request_id: t.Optional(t.String()),
+      satusehatServiceRequestId: t.Optional(t.String())
     })
   })
   .get("/:id", OrderController.getDetailsHandler)

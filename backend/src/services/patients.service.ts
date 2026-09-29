@@ -23,16 +23,39 @@ export class PatientService {
   }
 
   static async createPatient(data: any) {
-    await db.insert(patients).values({
+    let normalizedGender: "L" | "P" | null = null;
+    if (data.gender) {
+      const g = String(data.gender).trim().toUpperCase();
+      if (g === "L" || g === "M" || g === "MALE") {
+        normalizedGender = "L";
+      } else if (g === "P" || g === "F" || g === "FEMALE") {
+        normalizedGender = "P";
+      }
+    }
+
+    const dobValue = data.dob || data.birthDate;
+
+    const [result]: any = await db.insert(patients).values({
       mrn: data.mrn,
       nik: data.nik || null,
       ihsNumber: data.ihsNumber || null,
       fullName: data.fullName,
-      dob: data.dob ? new Date(data.dob) : null,
-      gender: data.gender,
-      address: data.address
+      dob: dobValue ? new Date(dobValue) : null,
+      gender: normalizedGender,
+      address: data.address || null
     });
-    return { success: true, message: "Pasien berhasil didaftarkan" };
+
+    const newId = result?.insertId ? Number(result.insertId) : undefined;
+    return { 
+      success: true, 
+      message: "Pasien berhasil didaftarkan",
+      id: newId,
+      mrn: data.mrn,
+      fullName: data.fullName,
+      nik: data.nik || null,
+      gender: normalizedGender,
+      dob: dobValue || null
+    };
   }
 
   static async getPatientById(id: number) {
@@ -41,14 +64,26 @@ export class PatientService {
   }
 
   static async updatePatient(id: number, data: any) {
+    let normalizedGender: "L" | "P" | undefined = undefined;
+    if (data.gender !== undefined) {
+      const g = String(data.gender).trim().toUpperCase();
+      if (g === "L" || g === "M" || g === "MALE") {
+        normalizedGender = "L";
+      } else if (g === "P" || g === "F" || g === "FEMALE") {
+        normalizedGender = "P";
+      }
+    }
+
+    const dobValue = data.dob || data.birthDate;
+
     await db.update(patients)
       .set({
         mrn: data.mrn || undefined,
         nik: data.nik !== undefined ? data.nik : undefined,
         ihsNumber: data.ihsNumber !== undefined ? data.ihsNumber : undefined,
         fullName: data.fullName || undefined,
-        dob: data.dob ? new Date(data.dob) : undefined,
-        gender: data.gender || undefined,
+        dob: dobValue ? new Date(dobValue) : undefined,
+        gender: normalizedGender,
         address: data.address || undefined
       })
       .where(eq(patients.id, id));

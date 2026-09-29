@@ -648,9 +648,10 @@ const endpoints = [
       { name: 'mrn', type: 'string', required: true, description: 'Nomor Rekam Medis unik dari SIMRS' },
       { name: 'fullName', type: 'string', required: true, description: 'Nama lengkap pasien sesuai KTP' },
       { name: 'nik', type: 'string (16 digit)', required: false, description: 'NIK KTP untuk lookup IHS SATUSEHAT (Sangat disarankan)' },
-      { name: 'gender', type: 'enum (male, female)', required: true, description: 'Jenis kelamin pasien' },
-      { name: 'dob', type: 'string (YYYY-MM-DD)', required: true, description: 'Tanggal lahir pasien' },
-      { name: 'address', type: 'string', required: false, description: 'Alamat domisili pasien' }
+      { name: 'gender', type: 'enum ("L", "P", "male", "female")', required: true, description: 'Jenis kelamin pasien (mendukung format L/P maupun male/female)' },
+      { name: 'dob', type: 'string (YYYY-MM-DD)', required: true, description: 'Tanggal lahir pasien (mendukung field dob atau birthDate)' },
+      { name: 'address', type: 'string', required: false, description: 'Alamat domisili pasien' },
+      { name: 'phone', type: 'string', required: false, description: 'Nomor telepon / WhatsApp pasien' }
     ]
   },
 
