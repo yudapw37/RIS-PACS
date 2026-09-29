@@ -81,11 +81,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'SystemInfo',
         component: () => import('../views/SystemInfo.vue')
       },
-      // Interoperabilitas Kemenkes SATUSEHAT
+      // Interoperabilitas Kemenkes SATUSEHAT & SIMRS
       {
         path: 'satusehat',
         name: 'SatusehatGateway',
         component: () => import('../views/SatusehatGateway.vue')
+      },
+      {
+        path: 'api-docs',
+        name: 'ApiDocs',
+        component: () => import('../views/ApiDocs.vue')
       }
     ]
   },

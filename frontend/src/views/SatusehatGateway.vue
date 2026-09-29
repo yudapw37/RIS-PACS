@@ -27,6 +27,14 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center gap-3">
+        <router-link 
+          to="/admin/api-docs" 
+          class="btn-secondary flex items-center gap-2 text-sm shadow-sm text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800/60 bg-cyan-50/50 dark:bg-cyan-950/20 hover:bg-cyan-100 dark:hover:bg-cyan-900/30"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Panduan API SIMRS
+        </router-link>
+
         <button 
           @click="testConnection" 
           :disabled="isTestingAuth"
