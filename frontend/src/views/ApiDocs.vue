@@ -201,30 +201,35 @@
           <!-- Modal Tabs Switcher -->
           <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 shrink-0 overflow-x-auto scrollbar-none">
             <button 
+              type="button"
               @click="activeModalTab = 'request'"
               :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'request' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               1. Request Body (JSON)
             </button>
             <button 
+              type="button"
               @click="activeModalTab = 'response'"
               :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'response' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               2. Response Sample (JSON)
             </button>
             <button 
+              type="button"
               @click="activeModalTab = 'curl'"
               :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'curl' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               3. Contoh cURL
             </button>
             <button 
+              type="button"
               @click="activeModalTab = 'params'"
               :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'params' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               4. Spesifikasi Parameter
             </button>
             <button 
+              type="button"
               @click="activeModalTab = 'tester'"
               :class="['px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 whitespace-nowrap', activeModalTab === 'tester' ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30' : 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100']"
             >
@@ -325,6 +330,7 @@
                     />
                   </div>
                   <button 
+                    type="button"
                     @click="executeTestRequest" 
                     :disabled="isExecutingTest"
                     class="btn-primary text-xs px-5 py-2.5 flex items-center justify-center gap-2 shadow-md shadow-cyan-600/20 shrink-0"
@@ -348,7 +354,7 @@
               <div v-if="testMethod !== 'GET'" class="space-y-1.5">
                 <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
                   <span>Request Body (JSON Payload):</span>
-                  <button @click="resetTestBody" class="text-cyan-600 dark:text-cyan-400 hover:underline text-[11px]">
+                  <button type="button" @click="resetTestBody" class="text-cyan-600 dark:text-cyan-400 hover:underline text-[11px]">
                     Reset ke Default Payload
                   </button>
                 </div>
@@ -377,7 +383,7 @@
                     </span>
                     <span class="font-mono text-[11px] text-slate-400">⏱️ {{ testResponse.duration }} ms</span>
                   </div>
-                  <button @click="copyText(JSON.stringify(testResponse.data, null, 2))" class="btn-secondary text-xs py-1 px-2.5 flex items-center gap-1">
+                  <button type="button" @click="copyText(JSON.stringify(testResponse.data, null, 2))" class="btn-secondary text-xs py-1 px-2.5 flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                     Salin Respons
                   </button>
@@ -468,7 +474,7 @@ const executeTestRequest = async () => {
   const startTime = Date.now()
 
   try {
-    let parsedBody = undefined
+    let parsedBody: any = undefined
     if (testMethod.value !== 'GET' && testRequestBody.value.trim()) {
       try {
         parsedBody = JSON.parse(testRequestBody.value)
@@ -480,7 +486,8 @@ const executeTestRequest = async () => {
     }
 
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Skip-Auth-Redirect': 'true'
     }
     if (testUseAuth.value) {
       const token = localStorage.getItem('ris_token')
@@ -490,31 +497,57 @@ const executeTestRequest = async () => {
     }
 
     const targetUrl = `${apiBaseUrl.value}${testUrl.value}`
-    const res = await axios({
-      method: testMethod.value as any,
-      url: targetUrl,
-      data: parsedBody,
+    
+    // Gunakan native window.fetch agar tidak memicu interceptor Axios global
+    // Sehingga respons 401 tidak akan menghapus token login aktif ataupun me-redirect ke login
+    const fetchOptions: RequestInit = {
+      method: testMethod.value,
       headers
-    })
-
-    const duration = Date.now() - startTime
-    testResponse.value = {
-      status: res.status,
-      statusText: res.statusText || 'OK',
-      duration,
-      data: res.data
     }
-    showToast(`Berhasil (${res.status} OK)`)
+    if (testMethod.value !== 'GET' && parsedBody !== undefined) {
+      fetchOptions.body = JSON.stringify(parsedBody)
+    }
+
+    const response = await fetch(targetUrl, fetchOptions)
+    const duration = Date.now() - startTime
+
+    let responseData: any = null
+    const contentType = response.headers.get('content-type') || ''
+    if (contentType.includes('application/json')) {
+      responseData = await response.json()
+    } else {
+      const text = await response.text()
+      try {
+        responseData = JSON.parse(text)
+      } catch {
+        responseData = text
+      }
+    }
+
+    testResponse.value = {
+      status: response.status,
+      statusText: response.statusText || (response.status >= 200 && response.status < 300 ? 'OK' : 'Error'),
+      duration,
+      data: responseData
+    }
+
+    if (response.status >= 200 && response.status < 300) {
+      showToast(`Berhasil (${response.status} ${response.statusText || 'OK'})`)
+    } else {
+      showToast(`Respons Server: HTTP ${response.status}`)
+    }
   } catch (err: any) {
     const duration = Date.now() - startTime
-    const errRes = err.response
     testResponse.value = {
-      status: errRes?.status || 500,
-      statusText: errRes?.statusText || (err.message ? err.message : 'Network Error'),
+      status: 0,
+      statusText: 'Network Error',
       duration,
-      data: errRes?.data || { error: err.message, message: 'Gagal terhubung ke endpoint atau server menolak permintaan.' }
+      data: {
+        error: err.message || 'Koneksi ke backend server gagal.',
+        tip: 'Pastikan backend server berjalan di port 3000 dan URL target dapat dijangkau.'
+      }
     }
-    showToast(`Respons Server: ${errRes?.status || 'Gagal'}`)
+    showToast(`Gagal: ${err.message || 'Koneksi gagal'}`)
   } finally {
     isExecutingTest.value = false
   }
@@ -558,8 +591,8 @@ const endpoints = [
     authRequired: false,
     tags: ['Auth', 'JWT', 'Bearer'],
     requestPayload: {
-      username: 'simrs_client',
-      password: 'password_simrs_2026'
+      username: 'superadmin',
+      password: 'password123'
     },
     responsePayload: {
       code: 200,

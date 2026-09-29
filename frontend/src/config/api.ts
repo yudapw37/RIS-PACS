@@ -19,13 +19,14 @@ axios.interceptors.response.use((response) => {
   return response
 }, (error) => {
   // Tangkap jika token expired / unauthorized
-  if (error.response && error.response.status === 401) {
+  const isLoginPage = window.location.pathname.includes('/login')
+  const isApiDocs = window.location.pathname.includes('/admin/api-docs')
+  const isAuthLoginRequest = error.config?.url?.includes('/api/auth/login')
+  const shouldSkipRedirect = isLoginPage || isApiDocs || isAuthLoginRequest || error.config?.headers?.['X-Skip-Auth-Redirect']
+
+  if (error.response && error.response.status === 401 && !shouldSkipRedirect) {
     localStorage.removeItem('ris_token')
-    
-    // Jangan redirect jika kita sudah berada di halaman login
-    if (!window.location.pathname.includes('/login')) {
-      window.location.href = '/login?expired=1'
-    }
+    window.location.href = '/login?expired=1'
   }
   return Promise.reject(error)
 })
