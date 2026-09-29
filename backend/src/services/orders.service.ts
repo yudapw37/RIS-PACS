@@ -1,13 +1,13 @@
 import { db } from "../db";
 import { orders, patients, doctors, modalities, modalityTypes, expertise } from "../db/schema";
-import { eq, inArray, desc, or, and, isNull, isNotNull } from "drizzle-orm";
+import { eq, inArray, desc, or, and, isNull, isNotNull, like } from "drizzle-orm";
 import { DCM4CHEEService } from "./dcm4chee.service";
 import { SatusehatService } from "./satusehat.service";
 
 export class OrderService {
-  // 0. Get ALL Orders (semua status, untuk Manajemen Order)
-  static async getAllOrders() {
-    return await db.select({
+  // 0. Get ALL Orders (semua status, untuk Manajemen Order & Integrasi SIMRS)
+  static async getAllOrders(options?: { search?: string; status?: string; limit?: number }) {
+    let q = db.select({
       id: orders.id,
       patientId: orders.patientId,
       noReg: orders.noReg,
@@ -43,7 +43,32 @@ export class OrderService {
     .innerJoin(patients, eq(orders.patientId, patients.id))
     .leftJoin(doctors, eq(orders.doctorId, doctors.id))
     .leftJoin(modalities, eq(orders.modalityId, modalities.id))
-    .orderBy(desc(orders.orderDate));
+    .$dynamic();
+
+    const conditions: any[] = [];
+    if (options?.status) {
+      conditions.push(eq(orders.status, options.status as any));
+    }
+    if (options?.search) {
+      conditions.push(
+        or(
+          like(orders.accessionNumber, `%${options.search}%`),
+          like(patients.fullName, `%${options.search}%`),
+          like(patients.mrn, `%${options.search}%`)
+        )
+      );
+    }
+    if (conditions.length > 0) {
+      q = q.where(and(...conditions));
+    }
+
+    q = q.orderBy(desc(orders.orderDate));
+
+    if (options?.limit) {
+      q = q.limit(options.limit);
+    }
+
+    return await q;
   }
 
   // 1. Get Active Worklist (Status: scheduled, in_progress)

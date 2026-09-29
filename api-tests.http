@@ -66,6 +66,15 @@ Content-Type: application/json
 }
 
 ### ------------------------------------------------------------------------------
+### 4b. ORDER: Ambil Semua Daftar Order Radiologi (GET)
+### ------------------------------------------------------------------------------
+# Bisa ditambahkan query params: ?search=Bambang atau ?status=completed&limit=20
+GET {{baseUrl}}/api/orders
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### ------------------------------------------------------------------------------
 ### 5. ORDER: Cek Status Detail Pemeriksaan (GET)
 ### ------------------------------------------------------------------------------
 GET {{baseUrl}}/api/orders/1

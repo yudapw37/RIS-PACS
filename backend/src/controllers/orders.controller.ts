@@ -2,9 +2,14 @@ import { OrderService } from "../services/orders.service";
 import { sendResponse } from "../utils/response";
 
 export class OrderController {
-  static async getAllOrdersHandler({ set }: any) {
+  static async getAllOrdersHandler({ query, set }: any) {
     try {
-      const data = await OrderService.getAllOrders();
+      const options = {
+        search: query?.search,
+        status: query?.status,
+        limit: query?.limit ? Number(query.limit) : undefined
+      };
+      const data = await OrderService.getAllOrders(options);
       return sendResponse(set, 200, "Berhasil memuat semua order", data);
     } catch (err: any) {
       return sendResponse(set, 500, "Terjadi gangguan sistem memuat semua order", { error: err.message });

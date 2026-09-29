@@ -654,8 +654,96 @@ const endpoints = [
       { name: 'phone', type: 'string', required: false, description: 'Nomor telepon / WhatsApp pasien' }
     ]
   },
+  {
+    id: 'patient-get-all',
+    category: 'patient',
+    categoryName: 'Master Pasien',
+    method: 'GET',
+    path: '/api/patients',
+    title: 'Cari & Ambil Daftar Pasien (Get All Patients)',
+    description: 'SIMRS memeriksa ketersediaan data pasien di SmartRIS berdasarkan Nama Pasien atau Nomor Rekam Medis (MRN).',
+    fullDescription: 'Gunakan endpoint ini untuk mengecek apakah pasien sudah terdaftar sebelum mengirimkan order baru, atau untuk sinkronisasi direktori master pasien.',
+    authRequired: true,
+    tags: ['Pasien', 'Pencarian', 'MRN', 'Daftar'],
+    requestPayload: null,
+    responsePayload: {
+      code: 200,
+      msg: 'Berhasil mengambil list pasien',
+      data: [
+        {
+          id: 3,
+          mrn: 'RM-2026-0089',
+          nik: '3201011508890002',
+          ihsNumber: null,
+          fullName: 'Bambang Sudarsono',
+          dob: '1989-08-15T00:00:00.000Z',
+          gender: 'L',
+          address: 'Jl. Merdeka No. 45, Jakarta Pusat'
+        }
+      ]
+    },
+    parameters: [
+      { name: 'search', type: 'query string', required: false, description: 'Kata kunci pencarian nama lengkap atau nomor MRN pasien' },
+      { name: 'limit', type: 'query number', required: false, description: 'Batasan jumlah data yang ditampilkan (opsional)' }
+    ]
+  },
 
   // ── 3. ORDER & SERVICEREQUEST ──
+  {
+    id: 'order-get-all',
+    category: 'order',
+    categoryName: 'Order Radiologi',
+    method: 'GET',
+    path: '/api/orders',
+    title: 'Ambil Semua Daftar Order Radiologi (Get All Orders)',
+    description: 'SIMRS mengambil daftar seluruh data dan antrean pemeriksaan radiologi, lengkap dengan data pasien, status alur kerja, ID ServiceRequest, dan status SATUSEHAT.',
+    fullDescription: 'Endpoint ini sangat berguna bagi SIMRS untuk memantau seluruh antrean radiologi, filter status (scheduled, in_progress, completed, canceled), serta mencari order berdasarkan nomor Accession atau data pasien.',
+    authRequired: true,
+    tags: ['Order', 'Semua Order', 'List', 'Monitoring', 'Worklist'],
+    requestPayload: null,
+    responsePayload: {
+      code: 200,
+      msg: 'Berhasil memuat semua order',
+      data: [
+        {
+          id: 1,
+          accessionNumber: 'ACC-20260928-001',
+          noReg: 'REG-20260928-01',
+          modalityTypeCode: 'DX',
+          bodyPart: 'Thorax PA',
+          clinicalInfo: 'Batuk kronis > 2 minggu, suspek TB',
+          priority: 'routine',
+          status: 'completed',
+          orderDate: '2026-09-28T02:09:46.000Z',
+          studyInstanceUid: '1.2.840.10008.5.1.4.1.1.7.12345',
+          satusehatStatus: 'synced',
+          satusehatServiceRequestId: 'sr-1727589123-simrs',
+          satusehatStudyId: 'study-ihs-998811',
+          satusehatReportId: 'report-ihs-998811',
+          patient: {
+            mrn: 'RM-2026-0001',
+            fullName: 'Siti Rahmawati',
+            nik: '3201012304950001',
+            ihsNumber: 'P01234567890',
+            gender: 'P',
+            dob: '1995-04-23'
+          },
+          doctor: {
+            fullName: 'dr. Raden Pratama, Sp.Rad'
+          },
+          modality: {
+            name: 'X-Ray Room 1',
+            aet: 'XR_ROOM1'
+          }
+        }
+      ]
+    },
+    parameters: [
+      { name: 'search', type: 'query string', required: false, description: 'Cari berdasarkan Accession Number, Nama Pasien, atau Nomor Rekam Medis (MRN)' },
+      { name: 'status', type: 'query enum (scheduled, in_progress, completed, canceled, failed)', required: false, description: 'Filter data berdasarkan status pengerjaan radiologi' },
+      { name: 'limit', type: 'query number', required: false, description: 'Batasi jumlah data yang ingin ditarik (cth: 50)' }
+    ]
+  },
   {
     id: 'order-create',
     category: 'order',

@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { OrderController } from "../controllers/orders.controller";
 
 export const orderRoutes = new Elysia({ prefix: "/api/orders" })
+  .get("/", OrderController.getAllOrdersHandler)
   .get("/all", OrderController.getAllOrdersHandler)
   .get("/worklist", OrderController.getWorklistHandler)
 
