@@ -1,0 +1,142 @@
+### ==============================================================================
+### SMARTRIS-PACS & SATUSEHAT REST API TEST COLLECTION (.http / REST Client)
+### ==============================================================================
+### File ini bisa langsung dijalankan dengan:
+### 1. Ekstensi "REST Client" di VS Code / Cursor / Antigravity IDE (Klik 'Send Request')
+### 2. Ekstensi "Thunder Client" atau import ke Bruno
+### ==============================================================================
+
+@baseUrl = http://localhost:3000
+@authToken = {{login.response.body.data.token}}
+
+### ------------------------------------------------------------------------------
+### 1. AUTENTIKASI: Login Admin / SIMRS
+### ------------------------------------------------------------------------------
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "superadmin",
+  "password": "password123"
+}
+
+### ------------------------------------------------------------------------------
+### 2. AUTENTIKASI: Cek Profil Pengguna Aktif
+### ------------------------------------------------------------------------------
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### ------------------------------------------------------------------------------
+### 3. PASIEN: Buat / Sinkronisasi Pasien Baru (POST)
+### ------------------------------------------------------------------------------
+# @name createPatient
+POST {{baseUrl}}/api/patients
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "mrn": "RM-2026-TEST",
+  "nik": "3171012345670001",
+  "fullName": "Budi Santoso Uji SIMRS",
+  "birthDate": "1985-07-15",
+  "gender": "male",
+  "address": "Jl. Merdeka No. 45, Jakarta Pusat",
+  "phone": "081234567890"
+}
+
+### ------------------------------------------------------------------------------
+### 4. ORDER: Buat Order Pemeriksaan Radiologi Baru (POST)
+### ------------------------------------------------------------------------------
+# Sertakan satusehat_service_request_id jika SIMRS Anda sudah meng-generate ID SR
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "patientId": 1,
+  "modalityTypeCode": "CR",
+  "bodyPart": "Thorax AP/PA",
+  "clinicalNotes": "Batuk kronis 3 minggu, suspek TB / pneumonia",
+  "priority": "ROUTINE",
+  "accessionNumber": "ACC-20260929-TEST01",
+  "satusehat_service_request_id": "SR-SIMRS-998811"
+}
+
+### ------------------------------------------------------------------------------
+### 5. ORDER: Cek Status Detail Pemeriksaan (GET)
+### ------------------------------------------------------------------------------
+GET {{baseUrl}}/api/orders/1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### ------------------------------------------------------------------------------
+### 6. SERVICE REQUEST: Update ID ServiceRequest secara Dinamis (PUT)
+### ------------------------------------------------------------------------------
+# Digunakan jika nomor SR baru diterbitkan oleh SIMRS setelah order dibuat
+PUT {{baseUrl}}/api/satusehat/orders/1/service-request-id
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "satusehat_service_request_id": "SR-KEMENKES-STG-202609-001"
+}
+
+
+### ------------------------------------------------------------------------------
+### 7. EKSPERTISE: Simpan / Update Hasil Ekspertise Dokter Radiologi (POST)
+### ------------------------------------------------------------------------------
+POST {{baseUrl}}/api/worklist/expertise/1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "findings": "Cor dan pulmo dalam batas normal. Tidak tampak infiltrat aktif pada kedua lapang paru. Sinus kostofrenikus lancip.",
+  "conclusion": "Cor dan Pulmo dalam batas normal (Normal Chest X-Ray).",
+  "critical": false
+}
+
+
+### ------------------------------------------------------------------------------
+### 8. EKSPERTISE: Tarik Hasil Bacaan / Ekspertise Dokter ke SIMRS (GET)
+### ------------------------------------------------------------------------------
+GET {{baseUrl}}/api/worklist/expertise/1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### ------------------------------------------------------------------------------
+### 9. EKSPERTISE: Hapus Hasil Ekspertise / Reset Draft (DELETE)
+### ------------------------------------------------------------------------------
+DELETE {{baseUrl}}/api/orders/1/expertise
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### ------------------------------------------------------------------------------
+### 10. SATUSEHAT: Push Standalone ServiceRequest ke Kemenkes Sandbox (POST)
+### ------------------------------------------------------------------------------
+# Trigger pengiriman FHIR ServiceRequest mandiri dari SmartRIS ke SATUSEHAT
+POST {{baseUrl}}/api/satusehat/push-service-request/1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### ------------------------------------------------------------------------------
+### 11. SATUSEHAT: Uji Koneksi Token OAuth2 Kemenkes Sandbox (POST)
+### ------------------------------------------------------------------------------
+POST {{baseUrl}}/api/satusehat/test-connection
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+
+### ------------------------------------------------------------------------------
+### 12. MASTER DOKTER: Hapus / Nonaktifkan Data Dokter (DELETE)
+### ------------------------------------------------------------------------------
+# Contoh pengujian endpoint DELETE
+DELETE {{baseUrl}}/api/doctors/999
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

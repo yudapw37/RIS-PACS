@@ -199,30 +199,36 @@
           </div>
 
           <!-- Modal Tabs Switcher -->
-          <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 shrink-0">
+          <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 shrink-0 overflow-x-auto scrollbar-none">
             <button 
               @click="activeModalTab = 'request'"
-              :class="['px-4 py-1.5 rounded-xl text-xs font-bold transition-all', activeModalTab === 'request' ? 'bg-cyan-600 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
+              :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'request' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               1. Request Body (JSON)
             </button>
             <button 
               @click="activeModalTab = 'response'"
-              :class="['px-4 py-1.5 rounded-xl text-xs font-bold transition-all', activeModalTab === 'response' ? 'bg-cyan-600 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
+              :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'response' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               2. Response Sample (JSON)
             </button>
             <button 
               @click="activeModalTab = 'curl'"
-              :class="['px-4 py-1.5 rounded-xl text-xs font-bold transition-all', activeModalTab === 'curl' ? 'bg-cyan-600 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
+              :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'curl' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               3. Contoh cURL
             </button>
             <button 
               @click="activeModalTab = 'params'"
-              :class="['px-4 py-1.5 rounded-xl text-xs font-bold transition-all', activeModalTab === 'params' ? 'bg-cyan-600 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
+              :class="['px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap', activeModalTab === 'params' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800']"
             >
               4. Spesifikasi Parameter
+            </button>
+            <button 
+              @click="activeModalTab = 'tester'"
+              :class="['px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 whitespace-nowrap', activeModalTab === 'tester' ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30' : 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100']"
+            >
+              <span>⚡</span> 5. Live Tester (Coba Kirim)
             </button>
           </div>
 
@@ -302,6 +308,84 @@
               </div>
             </div>
 
+            <!-- TAB 5: Live Tester -->
+            <div v-if="activeModalTab === 'tester'" class="space-y-4">
+              <!-- Tester Header Controls -->
+              <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <span :class="['px-3 py-2 rounded-xl text-xs font-black tracking-wide border shrink-0', getMethodClass(testMethod)]">
+                    {{ testMethod }}
+                  </span>
+                  <div class="flex-1 relative">
+                    <input 
+                      v-model="testUrl" 
+                      type="text" 
+                      class="w-full text-xs font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-cyan-500 shadow-sm"
+                      placeholder="/api/..."
+                    />
+                  </div>
+                  <button 
+                    @click="executeTestRequest" 
+                    :disabled="isExecutingTest"
+                    class="btn-primary text-xs px-5 py-2.5 flex items-center justify-center gap-2 shadow-md shadow-cyan-600/20 shrink-0"
+                  >
+                    <svg v-if="isExecutingTest" class="animate-spin w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>{{ isExecutingTest ? 'Mengirim...' : 'Kirim Request' }}</span>
+                  </button>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
+                  <label class="flex items-center gap-2 cursor-pointer font-medium text-slate-700 dark:text-slate-300">
+                    <input type="checkbox" v-model="testUseAuth" class="rounded text-cyan-600 focus:ring-cyan-500" />
+                    <span>Gunakan Token Login Aktif (Otomatis Bearer)</span>
+                  </label>
+                  <span class="font-mono text-[11px] text-slate-400">Target: {{ apiBaseUrl }}{{ testUrl }}</span>
+                </div>
+              </div>
+
+              <!-- Request Body Editor (If method != GET) -->
+              <div v-if="testMethod !== 'GET'" class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300">
+                  <span>Request Body (JSON Payload):</span>
+                  <button @click="resetTestBody" class="text-cyan-600 dark:text-cyan-400 hover:underline text-[11px]">
+                    Reset ke Default Payload
+                  </button>
+                </div>
+                <textarea 
+                  v-model="testRequestBody" 
+                  rows="7" 
+                  class="w-full text-xs font-mono bg-slate-900 text-cyan-300 border border-slate-800 rounded-xl p-3 focus:outline-none focus:border-cyan-500 leading-relaxed shadow-inner resize-y"
+                  placeholder="{}"
+                ></textarea>
+              </div>
+
+              <!-- Test Result Output -->
+              <div v-if="testResponse" class="space-y-1.5 pt-2">
+                <div class="flex items-center justify-between text-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-slate-700 dark:text-slate-200">Hasil Respons Server:</span>
+                    <span 
+                      :class="[
+                        'px-2.5 py-0.5 rounded-lg text-[11px] font-black tracking-wide border',
+                        testResponse.status >= 200 && testResponse.status < 300 
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800' 
+                          : 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 border-rose-300 dark:border-rose-800'
+                      ]"
+                    >
+                      HTTP {{ testResponse.status }} {{ testResponse.statusText }}
+                    </span>
+                    <span class="font-mono text-[11px] text-slate-400">⏱️ {{ testResponse.duration }} ms</span>
+                  </div>
+                  <button @click="copyText(JSON.stringify(testResponse.data, null, 2))" class="btn-secondary text-xs py-1 px-2.5 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    Salin Respons
+                  </button>
+                </div>
+                <pre class="p-4 rounded-xl bg-slate-900 text-emerald-300 font-mono text-xs overflow-auto max-h-72 leading-relaxed border border-slate-800 shadow-inner select-all">{{ JSON.stringify(testResponse.data, null, 2) }}</pre>
+              </div>
+            </div>
+
           </div>
 
           <!-- Modal Footer -->
@@ -326,6 +410,7 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
+import axios from 'axios'
 import API_BASE from '../config/api'
 
 const apiBaseUrl = computed(() => API_BASE || window.location.origin)
@@ -347,11 +432,92 @@ const copyText = (text: string) => {
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 const selectedEndpoint = ref<any | null>(null)
-const activeModalTab = ref<'request' | 'response' | 'curl' | 'params'>('request')
+const activeModalTab = ref<'request' | 'response' | 'curl' | 'params' | 'tester'>('request')
+
+// Tester State
+const testMethod = ref('GET')
+const testUrl = ref('')
+const testRequestBody = ref('')
+const testUseAuth = ref(true)
+const isExecutingTest = ref(false)
+const testResponse = ref<{ status: number; statusText: string; duration: number; data: any } | null>(null)
 
 const openDetail = (ep: any) => {
   selectedEndpoint.value = ep
   activeModalTab.value = ep.requestPayload ? 'request' : 'response'
+  
+  // Init tester state with endpoint default values
+  testMethod.value = ep.method
+  testUrl.value = ep.path
+  testRequestBody.value = ep.requestPayload ? JSON.stringify(ep.requestPayload, null, 2) : ''
+  testUseAuth.value = ep.authRequired !== false
+  testResponse.value = null
+}
+
+const resetTestBody = () => {
+  if (selectedEndpoint.value?.requestPayload) {
+    testRequestBody.value = JSON.stringify(selectedEndpoint.value.requestPayload, null, 2)
+  } else {
+    testRequestBody.value = ''
+  }
+}
+
+const executeTestRequest = async () => {
+  isExecutingTest.value = true
+  testResponse.value = null
+  const startTime = Date.now()
+
+  try {
+    let parsedBody = undefined
+    if (testMethod.value !== 'GET' && testRequestBody.value.trim()) {
+      try {
+        parsedBody = JSON.parse(testRequestBody.value)
+      } catch (e: any) {
+        showToast('Format JSON Body tidak valid! Mohon cek tanda kutip dan koma.')
+        isExecutingTest.value = false
+        return
+      }
+    }
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    }
+    if (testUseAuth.value) {
+      const token = localStorage.getItem('ris_token')
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+    }
+
+    const targetUrl = `${apiBaseUrl.value}${testUrl.value}`
+    const res = await axios({
+      method: testMethod.value as any,
+      url: targetUrl,
+      data: parsedBody,
+      headers
+    })
+
+    const duration = Date.now() - startTime
+    testResponse.value = {
+      status: res.status,
+      statusText: res.statusText || 'OK',
+      duration,
+      data: res.data
+    }
+    showToast(`Berhasil (${res.status} OK)`)
+  } catch (err: any) {
+    const duration = Date.now() - startTime
+    const errRes = err.response
+    testResponse.value = {
+      status: errRes?.status || 500,
+      statusText: errRes?.statusText || (err.message ? err.message : 'Network Error'),
+      duration,
+      data: errRes?.data || { error: err.message, message: 'Gagal terhubung ke endpoint atau server menolak permintaan.' }
+    }
+    showToast(`Respons Server: ${errRes?.status || 'Gagal'}`)
+  } finally {
+    isExecutingTest.value = false
+  }
 }
 
 // Categories
