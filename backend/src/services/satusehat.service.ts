@@ -35,6 +35,7 @@ let cachedToken: {
 export interface SatusehatPushResult {
   success: boolean;
   message: string;
+  serviceRequestId?: string;
   imagingStudyId?: string;
   diagnosticReportId?: string;
   logIds: number[];
@@ -459,6 +460,215 @@ export class SatusehatService {
   }
 
   /**
+   * Update ID ServiceRequest (SR) manual (misal kiriman dari SIMRS eksternal)
+   */
+  static async updateServiceRequestId(orderId: number, serviceRequestId: string) {
+    const trimmed = (serviceRequestId || "").trim();
+    await db.update(orders)
+      .set({ satusehatServiceRequestId: trimmed || null })
+      .where(eq(orders.id, orderId));
+    return { success: true, message: "ID ServiceRequest berhasil disimpan", serviceRequestId: trimmed };
+  }
+
+  /**
+   * 3.5 Kirim FHIR ServiceRequest (Order Radiologi) ke SATUSEHAT
+   */
+  static async pushServiceRequest(orderId: number) {
+    const settings = await this.getSettings();
+
+    const orderRows = await db.select({
+      order: orders,
+      patient: patients,
+      doctor: doctors,
+      modality: modalities,
+    })
+    .from(orders)
+    .innerJoin(patients, eq(orders.patientId, patients.id))
+    .leftJoin(doctors, eq(orders.doctorId, doctors.id))
+    .leftJoin(modalities, eq(orders.modalityId, modalities.id))
+    .where(eq(orders.id, orderId))
+    .limit(1);
+
+    if (orderRows.length === 0) {
+      throw new Error(`Order ID ${orderId} tidak ditemukan.`);
+    }
+
+    const { order, patient, doctor } = orderRows[0];
+
+    // Jika sudah ada ID SR yang tersimpan, kembalikan langsung
+    if (order.satusehatServiceRequestId) {
+      return { 
+        success: true, 
+        serviceRequestId: order.satusehatServiceRequestId, 
+        message: "Order sudah memiliki ID ServiceRequest",
+        isSimulated: false 
+      };
+    }
+
+    // Pastikan pasien punya IHS
+    let patientIhs = patient.ihsNumber;
+    if (!patientIhs) {
+      if (patient.nik) {
+        const lookup = await this.lookupPatientIhs(patient.id, patient.nik);
+        patientIhs = lookup.ihsNumber;
+      } else {
+        throw new Error(`Pasien ${patient.fullName} belum memiliki NIK/IHS.`);
+      }
+    }
+
+    let doctorIhs = doctor?.ihsNumber;
+    if (!doctorIhs && doctor?.nik) {
+      try {
+        const dLookup = await this.lookupDoctorIhs(doctor.id, doctor.nik);
+        doctorIhs = dLookup.ihsNumber;
+      } catch {}
+    }
+
+    // Tentukan kode LOINC berdasarkan bagian tubuh atau modalitas
+    const bodyPartLower = (order.bodyPart || "").toLowerCase();
+    let loincCode = "36554-4";
+    let loincDisplay = "Radiography of thorax";
+
+    if (bodyPartLower.includes("abdo")) {
+      loincCode = "36561-9";
+      loincDisplay = "Radiography of abdomen";
+    } else if (bodyPartLower.includes("kepala") || bodyPartLower.includes("cran") || bodyPartLower.includes("head")) {
+      loincCode = "36572-6";
+      loincDisplay = "Radiography of skull";
+    } else if (order.modalityTypeCode === "CT") {
+      loincCode = "24627-2";
+      loincDisplay = "CT scan study";
+    } else if (order.modalityTypeCode === "MR" || order.modalityTypeCode === "MRI") {
+      loincCode = "24628-0";
+      loincDisplay = "MRI study";
+    }
+
+    const serviceRequestPayload = {
+      resourceType: "ServiceRequest",
+      identifier: [
+        {
+          system: `http://sys-ids.kemkes.go.id/servicerequest/${settings.organizationId}`,
+          value: order.accessionNumber,
+        }
+      ],
+      status: "active",
+      intent: "original-order",
+      priority: order.priority === "stat" ? "stat" : order.priority === "urgent" ? "urgent" : "routine",
+      category: [
+        {
+          coding: [
+            {
+              system: "http://snomed.info/sct",
+              code: "363679005",
+              display: "Imaging"
+            }
+          ]
+        }
+      ],
+      code: {
+        coding: [
+          {
+            system: "http://loinc.org",
+            code: loincCode,
+            display: loincDisplay
+          }
+        ],
+        text: order.bodyPart ? `Pemeriksaan ${order.bodyPart}` : `Pemeriksaan Radiologi ${order.modalityTypeCode}`
+      },
+      subject: {
+        reference: `Patient/${patientIhs}`,
+        display: patient.fullName
+      },
+      occurrenceDateTime: (order.orderDate || new Date()).toISOString(),
+      authoredOn: (order.orderDate || new Date()).toISOString(),
+      requester: doctorIhs ? {
+        reference: `Practitioner/${doctorIhs}`,
+        display: doctor?.fullName || "Dokter Perujuk"
+      } : {
+        reference: `Organization/${settings.organizationId}`,
+        display: "Fasilitas Pelayanan Kesehatan"
+      }
+    };
+
+    // Mode Simulasi
+    if (settings.simulationMode === "yes") {
+      const simulatedSrId = `sr-${order.accessionNumber.toLowerCase().replace(/[^a-z0-9]/g, "")}-${order.id}`;
+      await db.update(orders)
+        .set({ satusehatServiceRequestId: simulatedSrId })
+        .where(eq(orders.id, orderId));
+
+      const logId = await this.logTransaction({
+        orderId,
+        patientId: patient.id,
+        resourceType: "ServiceRequest",
+        action: "PUSH_SERVICE_REQUEST",
+        status: "success",
+        satusehatId: simulatedSrId,
+        httpStatus: 201,
+        requestPayload: serviceRequestPayload,
+        responsePayload: { resourceType: "ServiceRequest", id: simulatedSrId, status: "active" },
+      });
+
+      return { success: true, serviceRequestId: simulatedSrId, logId, isSimulated: true };
+    }
+
+    // Mode Live SATUSEHAT
+    const auth = await this.getAuthToken();
+    if (!auth.success) {
+      throw new Error(`Gagal otentikasi SATUSEHAT: ${auth.error}`);
+    }
+
+    const url = `${settings.baseUrl.replace(/\/+$/, "")}/ServiceRequest`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${auth.token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify(serviceRequestPayload)
+    });
+
+    const responseBody = await response.json();
+
+    if (response.status === 201 || response.ok) {
+      const serviceRequestId = responseBody.id;
+      await db.update(orders)
+        .set({ satusehatServiceRequestId: serviceRequestId })
+        .where(eq(orders.id, orderId));
+
+      const logId = await this.logTransaction({
+        orderId,
+        patientId: patient.id,
+        resourceType: "ServiceRequest",
+        action: "PUSH_SERVICE_REQUEST",
+        status: "success",
+        satusehatId: serviceRequestId,
+        httpStatus: response.status,
+        requestPayload: serviceRequestPayload,
+        responsePayload: responseBody,
+      });
+
+      return { success: true, serviceRequestId, logId, isSimulated: false };
+    } else {
+      const errMsg = responseBody.issue?.[0]?.details?.text || `HTTP ${response.status}: Gagal push ServiceRequest`;
+      const logId = await this.logTransaction({
+        orderId,
+        patientId: patient.id,
+        resourceType: "ServiceRequest",
+        action: "PUSH_SERVICE_REQUEST",
+        status: "failed",
+        httpStatus: response.status,
+        requestPayload: serviceRequestPayload,
+        responsePayload: responseBody,
+        errorMessage: errMsg,
+      });
+
+      throw new Error(errMsg);
+    }
+  }
+
+  /**
    * 4. Kirim FHIR ImagingStudy ke SATUSEHAT
    */
   static async pushImagingStudy(orderId: number) {
@@ -493,6 +703,17 @@ export class SatusehatService {
       }
     }
 
+    // Pastikan ServiceRequest ID tersedia untuk tautan basedOn
+    let serviceRequestId = order.satusehatServiceRequestId;
+    if (!serviceRequestId) {
+      try {
+        const srRes = await this.pushServiceRequest(orderId);
+        serviceRequestId = srRes.serviceRequestId;
+      } catch (srErr: any) {
+        console.warn(`[SATUSEHAT] Peringatan: Tidak dapat membuat ServiceRequest otomatis: ${srErr.message}`);
+      }
+    }
+
     // Ambil metadata DICOM dari DCM4CHEE
     const dicomInfo = await this.resolveDicomMetadata(order.accessionNumber, order.id);
     const studyUid = order.studyInstanceUid || dicomInfo.studyInstanceUid;
@@ -508,13 +729,18 @@ export class SatusehatService {
     }
 
     // Bangun payload FHIR ImagingStudy standar SATUSEHAT Kemenkes RI
-    const imagingStudyPayload = {
+    const imagingStudyPayload: any = {
       resourceType: "ImagingStudy",
       status: "available",
       subject: {
         reference: `Patient/${patientIhs}`,
         display: patient.fullName,
       },
+      basedOn: serviceRequestId ? [
+        {
+          reference: `ServiceRequest/${serviceRequestId}`
+        }
+      ] : undefined,
       identifier: [
         {
           use: "official",
@@ -761,6 +987,11 @@ export class SatusehatService {
           display: doc?.fullName || "Dokter Spesialis Radiologi",
         }
       ] : undefined,
+      basedOn: order.satusehatServiceRequestId ? [
+        {
+          reference: `ServiceRequest/${order.satusehatServiceRequestId}`,
+        }
+      ] : undefined,
       imagingStudy: order.satusehatStudyId ? [
         {
           reference: `ImagingStudy/${order.satusehatStudyId}`,
@@ -884,11 +1115,23 @@ export class SatusehatService {
       .where(eq(orders.id, orderId));
 
     try {
-      // Step A: Push ImagingStudy
+      // Step A: Push ServiceRequest jika belum ada
+      let serviceRequestId = orderRows[0].order.satusehatServiceRequestId;
+      if (!serviceRequestId) {
+        try {
+          const srResult = await this.pushServiceRequest(orderId);
+          if (srResult.logId) logIds.push(srResult.logId);
+          serviceRequestId = srResult.serviceRequestId;
+        } catch (srErr: any) {
+          console.warn(`[SATUSEHAT] Peringatan: Gagal push ServiceRequest: ${srErr.message}`);
+        }
+      }
+
+      // Step B: Push ImagingStudy
       const studyResult = await this.pushImagingStudy(orderId);
       if (studyResult.logId) logIds.push(studyResult.logId);
 
-      // Step B: Cek apakah ada ekspertise yang sudah dibuat
+      // Step C: Cek apakah ada ekspertise yang sudah dibuat
       const expRows = await db.select().from(expertise).where(eq(expertise.orderId, orderId)).limit(1);
       let reportId: string | undefined;
 
@@ -909,6 +1152,7 @@ export class SatusehatService {
       return {
         success: true,
         message: `Order radiologi berhasil disinkronkan ke SATUSEHAT${studyResult.isSimulated ? " (Mode Simulasi)" : ""}`,
+        serviceRequestId,
         imagingStudyId: studyResult.imagingStudyId,
         diagnosticReportId: reportId,
         logIds,

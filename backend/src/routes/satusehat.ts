@@ -6,6 +6,12 @@ export const satusehatRoutes = new Elysia({ prefix: "/api/satusehat" })
   .get("/logs", SatusehatController.getLogsHandler)
   .get("/logs/:id", SatusehatController.getLogDetailHandler)
   .post("/push-order/:orderId", SatusehatController.pushOrderHandler)
+  .post("/push-service-request/:orderId", SatusehatController.pushServiceRequestHandler)
+  .put("/orders/:orderId/service-request-id", SatusehatController.updateServiceRequestIdHandler, {
+    body: t.Object({
+      serviceRequestId: t.String()
+    })
+  })
   .post("/retry-log/:logId", SatusehatController.retryLogHandler)
   .post("/lookup-patient-ihs/:patientId", SatusehatController.lookupPatientIhsHandler, {
     body: t.Optional(t.Object({

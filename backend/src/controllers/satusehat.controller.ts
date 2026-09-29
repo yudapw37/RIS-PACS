@@ -78,6 +78,44 @@ export class SatusehatController {
   }
 
   /**
+   * POST /api/satusehat/push-service-request/:orderId
+   * Kirim ServiceRequest mandiri ke SATUSEHAT
+   */
+  static async pushServiceRequestHandler({ params: { orderId }, set }: any) {
+    try {
+      const id = Number(orderId);
+      if (!id || isNaN(id)) {
+        set.status = 400;
+        return { success: false, message: "ID Order tidak valid." };
+      }
+      const result = await SatusehatService.pushServiceRequest(id);
+      return result;
+    } catch (err: any) {
+      set.status = 500;
+      return { success: false, message: err.message };
+    }
+  }
+
+  /**
+   * PUT /api/satusehat/orders/:orderId/service-request-id
+   * Simpan atau update manual ID ServiceRequest (dari SIMRS eksternal)
+   */
+  static async updateServiceRequestIdHandler({ params: { orderId }, body, set }: any) {
+    try {
+      const id = Number(orderId);
+      if (!id || isNaN(id)) {
+        set.status = 400;
+        return { success: false, message: "ID Order tidak valid." };
+      }
+      const result = await SatusehatService.updateServiceRequestId(id, body?.serviceRequestId || "");
+      return result;
+    } catch (err: any) {
+      set.status = 500;
+      return { success: false, message: err.message };
+    }
+  }
+
+  /**
    * POST /api/satusehat/retry-log/:logId
    * Kirim ulang transaksi yang gagal
    */

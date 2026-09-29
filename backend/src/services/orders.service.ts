@@ -20,6 +20,7 @@ export class OrderService {
       orderDate: orders.orderDate,
       studyInstanceUid: orders.studyInstanceUid,
       satusehatStatus: orders.satusehatStatus,
+      satusehatServiceRequestId: orders.satusehatServiceRequestId,
       satusehatStudyId: orders.satusehatStudyId,
       satusehatReportId: orders.satusehatReportId,
       patient: {
@@ -326,6 +327,7 @@ export class OrderService {
       orderDate: orders.orderDate,
       studyInstanceUid: orders.studyInstanceUid,
       satusehatStatus: orders.satusehatStatus,
+      satusehatServiceRequestId: orders.satusehatServiceRequestId,
       satusehatStudyId: orders.satusehatStudyId,
       satusehatReportId: orders.satusehatReportId,
       patient: {

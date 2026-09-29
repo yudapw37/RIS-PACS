@@ -187,6 +187,7 @@
             class="text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 focus:outline-none"
           >
             <option value="all">Semua Resource</option>
+            <option value="ServiceRequest">ServiceRequest (Order)</option>
             <option value="ImagingStudy">ImagingStudy (DICOM)</option>
             <option value="DiagnosticReport">DiagnosticReport (Ekspertise)</option>
             <option value="Patient">Patient (IHS)</option>
@@ -369,6 +370,7 @@
                 <th class="px-5 py-3 text-left">Accession No</th>
                 <th class="px-5 py-3 text-left">Pasien (NIK & IHS)</th>
                 <th class="px-5 py-3 text-left">Pemeriksaan</th>
+                <th class="px-5 py-3 text-left">ServiceRequest (ID SR)</th>
                 <th class="px-5 py-3 text-left">Status RIS</th>
                 <th class="px-5 py-3 text-center">Status SATUSEHAT</th>
                 <th class="px-5 py-3 text-right">Aksi</th>
@@ -402,6 +404,69 @@
                   <span class="text-xs text-slate-600 dark:text-slate-400 ml-2 font-medium">
                     {{ order.bodyPart || 'Radiografi' }}
                   </span>
+                </td>
+
+                <!-- Kolom ServiceRequest (ID SR) -->
+                <td class="px-5 py-3.5">
+                  <!-- Mode Edit / Input Manual SR -->
+                  <div v-if="editingSrOrderId === order.id" class="flex items-center gap-1.5">
+                    <input 
+                      v-model="srInputValues[order.id]" 
+                      type="text" 
+                      class="text-xs font-mono px-2 py-1 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 w-32 focus:outline-none focus:border-cyan-500"
+                      placeholder="cth: sr-12345"
+                      @keyup.enter="saveManualSrId(order.id)"
+                    />
+                    <button 
+                      @click="saveManualSrId(order.id)" 
+                      class="p-1 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition" 
+                      title="Simpan ID SR"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                    <button 
+                      @click="editingSrOrderId = null" 
+                      class="p-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-300"
+                      title="Batal"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+
+                  <!-- Mode Normal: ID SR Sudah Ada -->
+                  <div v-else-if="order.satusehatServiceRequestId" class="flex items-center gap-1.5">
+                    <span class="font-mono text-xs font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800/50 truncate max-w-[130px]" :title="order.satusehatServiceRequestId">
+                      {{ order.satusehatServiceRequestId }}
+                    </span>
+                    <button 
+                      @click="startEditSr(order)" 
+                      class="p-1 text-slate-400 hover:text-slate-600 rounded transition" 
+                      title="Ubah ID SR Manual"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </button>
+                  </div>
+
+                  <!-- Mode Normal: ID SR Belum Ada (Tersedia Tombol Kirim SR / Input Manual) -->
+                  <div v-else class="flex items-center gap-1.5">
+                    <button 
+                      @click="pushServiceRequest(order.id)" 
+                      :disabled="pushingSrId === order.id"
+                      class="px-2 py-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 rounded-lg hover:bg-indigo-100 flex items-center gap-1 transition"
+                      title="Kirim ServiceRequest mandiri ke SATUSEHAT"
+                    >
+                      <svg v-if="pushingSrId === order.id" class="animate-spin w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      Kirim SR
+                    </button>
+                    <button 
+                      @click="startEditSr(order)" 
+                      class="text-[11px] font-semibold text-slate-400 hover:text-slate-600 underline"
+                      title="Isi manual jika sudah ada dari SIMRS"
+                    >
+                      Isi Manual
+                    </button>
+                  </div>
                 </td>
 
                 <td class="px-5 py-3.5">
@@ -714,6 +779,53 @@ const filters = reactive({
 const ordersList = ref<any[]>([])
 const loadingOrders = ref(false)
 const pushingOrderId = ref<number | null>(null)
+const pushingSrId = ref<number | null>(null)
+const editingSrOrderId = ref<number | null>(null)
+const srInputValues = reactive<Record<number, string>>({})
+
+const startEditSr = (order: any) => {
+  editingSrOrderId.value = order.id
+  srInputValues[order.id] = order.satusehatServiceRequestId || ''
+}
+
+const saveManualSrId = async (orderId: number) => {
+  const val = srInputValues[orderId] || ''
+  try {
+    const res = await axios.put(`${API_BASE}/api/satusehat/orders/${orderId}/service-request-id`, {
+      serviceRequestId: val
+    })
+    if (res.data.success) {
+      showToast('ID ServiceRequest berhasil disimpan')
+      editingSrOrderId.value = null
+      fetchOrders()
+    }
+  } catch (err: any) {
+    showToast(err.response?.data?.message || 'Gagal menyimpan ID SR', 'error')
+  }
+}
+
+const pushServiceRequest = async (orderId: number) => {
+  if (!orderId || isNaN(orderId)) {
+    showToast('ID Order tidak valid', 'error')
+    return
+  }
+  pushingSrId.value = orderId
+  try {
+    const res = await axios.post(`${API_BASE}/api/satusehat/push-service-request/${orderId}`)
+    if (res.data.success) {
+      showToast(res.data.message || 'ServiceRequest berhasil dibuat & dikirim ke SATUSEHAT')
+      fetchOrders()
+      fetchStats()
+      if (activeTab.value === 'logs') fetchLogs()
+    } else {
+      showToast(res.data.message || 'Gagal mengirim ServiceRequest', 'error')
+    }
+  } catch (err: any) {
+    showToast(err.response?.data?.message || 'Gagal kirim ServiceRequest', 'error')
+  } finally {
+    pushingSrId.value = null
+  }
+}
 
 // Settings Form
 const settingsForm = reactive({
@@ -921,6 +1033,8 @@ const formatTime = (dateVal: string | null) => {
 
 const getResourceBadgeClass = (resType: string) => {
   switch (resType) {
+    case 'ServiceRequest':
+      return 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'
     case 'ImagingStudy':
       return 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800'
     case 'DiagnosticReport':
