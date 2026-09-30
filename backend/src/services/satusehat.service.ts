@@ -435,8 +435,59 @@ export class SatusehatService {
           const numSeries = s["00201206"]?.Value?.[0] || 1;
           const numInstances = s["00201208"]?.Value?.[0] || 1;
 
+          let seriesUID = `${studyUID.slice(0, 58)}.${orderId % 1000}`;
+          let sopUID = `${studyUID.slice(0, 56)}.${(orderId % 1000) + 1}`;
+          let sopClassUID = "urn:oid:1.2.840.10008.5.1.4.1.1.1";
+
+          try {
+            const seriesRes = await fetch(
+              `${dcmUrl}/dcm4chee-arc/aets/${dcmAet}/rs/studies/${studyUID}/series`,
+              {
+                headers: { "Accept": "application/dicom+json" },
+                signal: AbortSignal.timeout(3000)
+              }
+            );
+            if (seriesRes.ok) {
+              const seriesList = await seriesRes.json();
+              if (Array.isArray(seriesList) && seriesList.length > 0) {
+                const s0 = seriesList[0];
+                const realSeriesUID = s0["0020000E"]?.Value?.[0];
+                if (realSeriesUID && realSeriesUID.length <= 64) {
+                  seriesUID = realSeriesUID;
+                }
+
+                const instRes = await fetch(
+                  `${dcmUrl}/dcm4chee-arc/aets/${dcmAet}/rs/studies/${studyUID}/series/${seriesUID}/instances`,
+                  {
+                    headers: { "Accept": "application/dicom+json" },
+                    signal: AbortSignal.timeout(3000)
+                  }
+                );
+                if (instRes.ok) {
+                  const instList = await instRes.json();
+                  if (Array.isArray(instList) && instList.length > 0) {
+                    const inst0 = instList[0];
+                    const realSopUID = inst0["00080018"]?.Value?.[0];
+                    const realSopClass = inst0["00080016"]?.Value?.[0];
+                    if (realSopUID && realSopUID.length <= 64) {
+                      sopUID = realSopUID;
+                    }
+                    if (realSopClass) {
+                      sopClassUID = realSopClass.startsWith("urn:oid:") ? realSopClass : `urn:oid:${realSopClass}`;
+                    }
+                  }
+                }
+              }
+            }
+          } catch {
+            // Abaikan error series/instance detail, gunakan fallback deterministik
+          }
+
           return {
             studyInstanceUid: studyUID,
+            seriesInstanceUid: seriesUID,
+            sopInstanceUid: sopUID,
+            sopClassUid: sopClassUID,
             modality,
             numberOfSeries: Number(numSeries),
             numberOfInstances: Number(numInstances),
@@ -448,10 +499,16 @@ export class SatusehatService {
       // Fallback deterministik jika DCM4CHEE offline
     }
 
-    // Standardized fallback DICOM UID untuk SmartRIS
-    const fallbackUID = `1.2.840.10008.5.1.4.1.1.${new Date().toISOString().slice(0, 10).replace(/-/g, "")}.${orderId}`;
+    // Standardized fallback DICOM UID untuk SmartRIS (maks 64 karakter sesuai standar FHIR & DICOM)
+    const now = Date.now();
+    const fallbackUID = `1.2.840.10008.5.1.4.1.1.${now}.${orderId}`.slice(0, 64);
+    const fallbackSeries = `1.2.840.10008.5.1.4.1.2.${now}.${orderId}`.slice(0, 64);
+    const fallbackSop = `1.2.840.10008.5.1.4.1.3.${now}.${orderId}`.slice(0, 64);
     return {
       studyInstanceUid: fallbackUID,
+      seriesInstanceUid: fallbackSeries,
+      sopInstanceUid: fallbackSop,
+      sopClassUid: "urn:oid:1.2.840.10008.5.1.4.1.1.1",
       modality: "DX",
       numberOfSeries: 1,
       numberOfInstances: 1,
@@ -471,7 +528,19 @@ export class SatusehatService {
   }
 
   /**
-   * 3.5 Kirim FHIR ServiceRequest (Order Radiologi) ke SATUSEHAT
+   * Update ID Encounter manual (kiriman dari SIMRS eksternal)
+   * Note: Encounter dibuat dan dikelola oleh SIMRS saat pendaftaran / kunjungan pasien.
+   */
+  static async updateEncounterId(orderId: number, encounterId: string) {
+    const trimmed = (encounterId || "").trim();
+    await db.update(orders)
+      .set({ satusehatEncounterId: trimmed || null })
+      .where(eq(orders.id, orderId));
+    return { success: true, message: "ID Encounter berhasil disimpan", encounterId: trimmed };
+  }
+
+  /**
+   * 3.5b Kirim FHIR ServiceRequest (Order Radiologi) ke SATUSEHAT
    */
   static async pushServiceRequest(orderId: number) {
     const settings = await this.getSettings();
@@ -543,7 +612,7 @@ export class SatusehatService {
       loincDisplay = "MRI study";
     }
 
-    const serviceRequestPayload = {
+    const serviceRequestPayload: any = {
       resourceType: "ServiceRequest",
       identifier: [
         {
@@ -579,6 +648,9 @@ export class SatusehatService {
         reference: `Patient/${patientIhs}`,
         display: patient.fullName
       },
+      encounter: order.satusehatEncounterId ? {
+        reference: `Encounter/${order.satusehatEncounterId}`
+      } : undefined,
       occurrenceDateTime: (order.orderDate || new Date()).toISOString(),
       authoredOn: (order.orderDate || new Date()).toISOString(),
       requester: doctorIhs ? {
@@ -587,7 +659,18 @@ export class SatusehatService {
       } : {
         reference: `Organization/${settings.organizationId}`,
         display: "Fasilitas Pelayanan Kesehatan"
-      }
+      },
+      performer: doctorIhs ? [
+        {
+          reference: `Practitioner/${doctorIhs}`,
+          display: doctor?.fullName || "Dokter Perujuk"
+        }
+      ] : [
+        {
+          reference: `Organization/${settings.organizationId}`,
+          display: "Fasilitas Pelayanan Kesehatan"
+        }
+      ]
     };
 
     // Mode Simulasi
@@ -692,6 +775,16 @@ export class SatusehatService {
 
     const { order, patient, modality } = orderRows[0];
 
+    // Jika sudah ada ImagingStudy ID, return langsung (hindari duplikasi)
+    if (order.satusehatStudyId) {
+      return {
+        success: true,
+        imagingStudyId: order.satusehatStudyId,
+        message: "Order sudah memiliki ID ImagingStudy di SATUSEHAT",
+        isSimulated: false
+      };
+    }
+
     // Pastikan pasien punya IHS Number
     let patientIhs = patient.ihsNumber;
     if (!patientIhs) {
@@ -717,8 +810,13 @@ export class SatusehatService {
     // Ambil metadata DICOM dari DCM4CHEE
     const dicomInfo = await this.resolveDicomMetadata(order.accessionNumber, order.id);
     const studyUid = order.studyInstanceUid || dicomInfo.studyInstanceUid;
-    const seriesUid = `${studyUid}.1`;
-    const sopUid = `${seriesUid}.1`;
+    const seriesUid = (dicomInfo.seriesInstanceUid && dicomInfo.seriesInstanceUid.length <= 64)
+      ? dicomInfo.seriesInstanceUid
+      : `${studyUid.slice(0, 58)}.${orderId % 1000}`;
+    const sopUid = (dicomInfo.sopInstanceUid && dicomInfo.sopInstanceUid.length <= 64)
+      ? dicomInfo.sopInstanceUid
+      : `${studyUid.slice(0, 56)}.${(orderId % 1000) + 1}`;
+    const sopClassCode = dicomInfo.sopClassUid || "urn:oid:1.2.840.10008.5.1.4.1.1.1";
     const modalityCode = order.modalityTypeCode || dicomInfo.modality || "DX";
 
     // Update study_instance_uid ke order jika belum ada
@@ -783,18 +881,12 @@ export class SatusehatService {
               uid: sopUid,
               sopClass: {
                 system: "urn:ietf:rfc:3986",
-                code: "urn:oid:1.2.840.10008.5.1.4.1.1.1", // CR/DX Image Storage
+                code: sopClassCode,
               },
               number: 1,
               title: `${order.accessionNumber} Key Frame`,
             }
           ]
-        }
-      ],
-      endpoint: [
-        {
-          reference: `Endpoint/${settings.organizationId}-wado-rs`,
-          display: `DCM4CHEE PACS WADO-RS (${settings.organizationId})`,
         }
       ]
     };
@@ -923,6 +1015,16 @@ export class SatusehatService {
 
     const { order, patient, exp, doc } = orderRows[0];
 
+    // Jika sudah ada DiagnosticReport ID, return langsung (hindari duplikasi)
+    if (order.satusehatReportId) {
+      return {
+        success: true,
+        diagnosticReportId: order.satusehatReportId,
+        message: "Order sudah memiliki ID DiagnosticReport di SATUSEHAT",
+        isSimulated: false
+      };
+    }
+
     if (!exp) {
       throw new Error(`Belum ada hasil ekspertise untuk Order ${order.accessionNumber}.`);
     }
@@ -945,7 +1047,9 @@ export class SatusehatService {
     }
 
     // Bangun payload FHIR DiagnosticReport standar SATUSEHAT
-    const diagnosticReportPayload = {
+    // PENTING: Kemenkes menolak identifier system acsn untuk DiagnosticReport (RuleNumber: 10432)
+    // Kemenkes WAJIB: encounter (10145), result/Observation (10385), basedOn/ServiceRequest (10387)
+    const diagnosticReportPayload: any = {
       resourceType: "DiagnosticReport",
       status: "final",
       category: [
@@ -973,14 +1077,20 @@ export class SatusehatService {
         reference: `Patient/${patientIhs}`,
         display: patient.fullName,
       },
+      encounter: order.satusehatEncounterId ? {
+        reference: `Encounter/${order.satusehatEncounterId}`
+      } : undefined,
       effectiveDateTime: (order.examFinishedAt || order.orderDate || new Date()).toISOString(),
       issued: (exp.createdAt || new Date()).toISOString(),
-      performer: doctorIhs ? [
-        {
+      performer: [
+        doctorIhs ? {
           reference: `Practitioner/${doctorIhs}`,
           display: doc?.fullName || "Dokter Spesialis Radiologi",
+        } : {
+          reference: `Organization/${settings.organizationId}`,
+          display: "Instalasi Radiologi",
         }
-      ] : undefined,
+      ],
       resultsInterpreter: doctorIhs ? [
         {
           reference: `Practitioner/${doctorIhs}`,
@@ -990,6 +1100,11 @@ export class SatusehatService {
       basedOn: order.satusehatServiceRequestId ? [
         {
           reference: `ServiceRequest/${order.satusehatServiceRequestId}`,
+        }
+      ] : undefined,
+      result: order.satusehatObservationId ? [
+        {
+          reference: `Observation/${order.satusehatObservationId}`,
         }
       ] : undefined,
       imagingStudy: order.satusehatStudyId ? [
@@ -1096,7 +1211,178 @@ export class SatusehatService {
   }
 
   /**
-   * 6. Workflow Lengkap: Push Order ke SATUSEHAT (ImagingStudy + DiagnosticReport jika ada)
+   * 5b. Kirim FHIR Observation (Temuan Radiologi) ke SATUSEHAT
+   * Observation wajib ada sebelum DiagnosticReport.result (RuleNumber: 10385)
+   */
+  static async pushObservation(orderId: number) {
+    const settings = await this.getSettings();
+
+    const orderRows = await db.select({
+      order: orders,
+      patient: patients,
+      exp: expertise,
+      doc: doctors,
+    })
+    .from(orders)
+    .innerJoin(patients, eq(orders.patientId, patients.id))
+    .leftJoin(expertise, eq(expertise.orderId, orders.id))
+    .leftJoin(doctors, eq(orders.doctorId, doctors.id))
+    .where(eq(orders.id, orderId))
+    .limit(1);
+
+    if (orderRows.length === 0) {
+      throw new Error(`Order ID ${orderId} tidak ditemukan.`);
+    }
+
+    const { order, patient, exp, doc } = orderRows[0];
+
+    if (!exp) {
+      throw new Error(`Belum ada ekspertise untuk Order ${order.accessionNumber}.`);
+    }
+
+    // Jika sudah ada Observation ID, return langsung
+    if (order.satusehatObservationId) {
+      return {
+        success: true,
+        observationId: order.satusehatObservationId,
+        message: "Order sudah memiliki Observation ID",
+        isSimulated: false
+      };
+    }
+
+    let patientIhs = patient.ihsNumber;
+    if (!patientIhs) throw new Error("Pasien belum memiliki IHS Number.");
+
+    // Resolve Practitioner
+    let practitionerRef = `Practitioner/10009880728`; // Sandbox default
+    let practitionerDisplay = "dr. Alexander";
+    let doctorIhs = doc?.ihsNumber;
+    if (doctorIhs) {
+      practitionerRef = `Practitioner/${doctorIhs}`;
+      practitionerDisplay = doc?.fullName || "Dokter Radiologi";
+    }
+
+    const observationPayload: any = {
+      resourceType: "Observation",
+      status: "final",
+      category: [
+        {
+          coding: [
+            {
+              system: "http://terminology.hl7.org/CodeSystem/observation-category",
+              code: "imaging",
+              display: "Imaging"
+            }
+          ]
+        }
+      ],
+      code: {
+        coding: [
+          {
+            system: "http://loinc.org",
+            code: "18748-4",
+            display: "Diagnostic imaging study"
+          }
+        ],
+        text: `Temuan Radiologi - ${order.bodyPart || "Radiografi"}`
+      },
+      subject: {
+        reference: `Patient/${patientIhs}`,
+        display: patient.fullName
+      },
+      encounter: order.satusehatEncounterId ? {
+        reference: `Encounter/${order.satusehatEncounterId}`
+      } : undefined,
+      effectiveDateTime: (order.examFinishedAt || new Date()).toISOString(),
+      issued: (exp.createdAt || new Date()).toISOString(),
+      performer: [
+        {
+          reference: practitionerRef,
+          display: practitionerDisplay
+        }
+      ],
+      valueString: exp.findings || exp.conclusions || "Pemeriksaan radiologi dalam batas normal."
+    };
+
+    // Mode Simulasi
+    if (settings.simulationMode === "yes") {
+      const simulatedId = `obs-${Date.now().toString(36)}-${order.id}`;
+      await db.update(orders)
+        .set({ satusehatObservationId: simulatedId })
+        .where(eq(orders.id, orderId));
+
+      const logId = await this.logTransaction({
+        orderId,
+        patientId: patient.id,
+        resourceType: "ImagingStudy",
+        action: "PUSH_OBSERVATION",
+        status: "success",
+        satusehatId: simulatedId,
+        httpStatus: 201,
+        requestPayload: observationPayload,
+        responsePayload: { ...observationPayload, id: simulatedId },
+      });
+
+      return { success: true, observationId: simulatedId, logId, isSimulated: true };
+    }
+
+    // Mode Live
+    const auth = await this.getAuthToken();
+    if (!auth.success) throw new Error(`Otentikasi gagal: ${auth.error}`);
+
+    const url = `${settings.baseUrl.replace(/\/+$/, "")}/Observation`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${auth.token}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify(observationPayload),
+    });
+
+    const responseBody = await response.json();
+
+    if (response.status === 201 || response.ok) {
+      const observationId = responseBody.id;
+      await db.update(orders)
+        .set({ satusehatObservationId: observationId })
+        .where(eq(orders.id, orderId));
+
+      const logId = await this.logTransaction({
+        orderId,
+        patientId: patient.id,
+        resourceType: "ImagingStudy",
+        action: "PUSH_OBSERVATION",
+        status: "success",
+        satusehatId: observationId,
+        httpStatus: response.status,
+        requestPayload: observationPayload,
+        responsePayload: responseBody,
+      });
+
+      return { success: true, observationId, logId, isSimulated: false };
+    } else {
+      const errMsg = responseBody.issue?.[0]?.details?.text || `HTTP ${response.status}: Gagal push Observation`;
+      await this.logTransaction({
+        orderId,
+        patientId: patient.id,
+        resourceType: "ImagingStudy",
+        action: "PUSH_OBSERVATION",
+        status: "failed",
+        httpStatus: response.status,
+        requestPayload: observationPayload,
+        responsePayload: responseBody,
+        errorMessage: errMsg,
+      });
+
+      throw new Error(errMsg);
+    }
+  }
+
+  /**
+   * 6. Workflow Lengkap: Push Order ke SATUSEHAT
+   * Urutan Kemenkes RI: Encounter -> ServiceRequest -> ImagingStudy -> Observation -> DiagnosticReport
    */
   static async pushOrderToSatusehat(orderId: number): Promise<SatusehatPushResult> {
     const logIds: number[] = [];
@@ -1115,8 +1401,19 @@ export class SatusehatService {
       .where(eq(orders.id, orderId));
 
     try {
-      // Step A: Push ServiceRequest jika belum ada
-      let serviceRequestId = orderRows[0].order.satusehatServiceRequestId;
+      const currentOrders = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+      if (currentOrders.length === 0) {
+        throw new Error(`Order ID ${orderId} tidak ditemukan.`);
+      }
+
+      // ID Encounter dikelola oleh SIMRS saat pendaftaran / kunjungan pasien
+      const encounterId = currentOrders[0].satusehatEncounterId;
+      if (!encounterId) {
+        console.info(`[SATUSEHAT] Catatan: Order ID ${orderId} belum memiliki satusehat_encounter_id dari SIMRS.`);
+      }
+
+      // Step A: Push ServiceRequest (jika belum ada)
+      let serviceRequestId = currentOrders[0].satusehatServiceRequestId;
       if (!serviceRequestId) {
         try {
           const srResult = await this.pushServiceRequest(orderId);
@@ -1127,21 +1424,30 @@ export class SatusehatService {
         }
       }
 
-      // Step B: Push ImagingStudy
+      // Step C: Push ImagingStudy
       const studyResult = await this.pushImagingStudy(orderId);
       if (studyResult.logId) logIds.push(studyResult.logId);
 
-      // Step C: Cek apakah ada ekspertise yang sudah dibuat
+      // Step D & E: Jika ada ekspertise -> push Observation + DiagnosticReport
       const expRows = await db.select().from(expertise).where(eq(expertise.orderId, orderId)).limit(1);
       let reportId: string | undefined;
 
       if (expRows.length > 0) {
+        // Step D: Push Observation (prerequisite DiagnosticReport.result)
+        try {
+          const obsResult = await this.pushObservation(orderId);
+          if (obsResult.logId) logIds.push(obsResult.logId);
+        } catch (obsErr: any) {
+          console.warn(`[SATUSEHAT] Peringatan: Gagal push Observation: ${obsErr.message}`);
+        }
+
+        // Step E: Push DiagnosticReport (butuh Encounter + ServiceRequest + Observation + ImagingStudy)
         try {
           const repResult = await this.pushDiagnosticReport(orderId);
           if (repResult.logId) logIds.push(repResult.logId);
           reportId = repResult.diagnosticReportId;
         } catch (repErr: any) {
-          console.warn(`Peringatan: Gagal push DiagnosticReport: ${repErr.message}`);
+          console.warn(`[SATUSEHAT] Peringatan: Gagal push DiagnosticReport: ${repErr.message}`);
         }
       }
 

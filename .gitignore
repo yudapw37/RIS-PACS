@@ -34,3 +34,8 @@ drizzle/meta/
 
 # Frontend build cache
 frontend/package-lock.json
+
+# DICOM samples
+*.dcm
+scripts/dicom_samples/
+

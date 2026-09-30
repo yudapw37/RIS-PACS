@@ -116,6 +116,25 @@ export class SatusehatController {
   }
 
   /**
+   * PUT /api/satusehat/orders/:orderId/encounter-id
+   * Simpan atau update manual ID Encounter (dari SIMRS eksternal)
+   */
+  static async updateEncounterIdHandler({ params: { orderId }, body, set }: any) {
+    try {
+      const id = Number(orderId);
+      if (!id || isNaN(id)) {
+        set.status = 400;
+        return { success: false, message: "ID Order tidak valid." };
+      }
+      const result = await SatusehatService.updateEncounterId(id, body?.encounterId || "");
+      return result;
+    } catch (err: any) {
+      set.status = 500;
+      return { success: false, message: err.message };
+    }
+  }
+
+  /**
    * POST /api/satusehat/retry-log/:logId
    * Kirim ulang transaksi yang gagal
    */

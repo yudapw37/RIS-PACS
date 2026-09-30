@@ -94,8 +94,10 @@ export const orders = mysqlTable("orders", {
   // [SATUSEHAT DICOM Gateway Integration]
   studyInstanceUid: varchar("study_instance_uid", { length: 128 }), // UID Study DICOM dari DCM4CHEE
   satusehatStatus: mysqlEnum("satusehat_status", ["unmapped", "pending", "synced", "failed"]).default("unmapped"),
+  satusehatEncounterId: varchar("satusehat_encounter_id", { length: 100 }), // ID FHIR Encounter Kemenkes
   satusehatServiceRequestId: varchar("satusehat_service_request_id", { length: 100 }), // ID FHIR ServiceRequest Kemenkes / SIMRS
   satusehatStudyId: varchar("satusehat_study_id", { length: 100 }), // ID FHIR ImagingStudy Kemenkes
+  satusehatObservationId: varchar("satusehat_observation_id", { length: 100 }), // ID FHIR Observation Kemenkes
   satusehatReportId: varchar("satusehat_report_id", { length: 100 }), // ID FHIR DiagnosticReport Kemenkes
 });
 

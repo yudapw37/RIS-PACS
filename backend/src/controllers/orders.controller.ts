@@ -74,6 +74,7 @@ export class OrderController {
         bodyPart: body.bodyPart || null,
         clinicalInfo: body.clinicalInfo || body.clinicalNotes || null,
         priority: (body.priority ? String(body.priority).toLowerCase() : "routine") as any,
+        satusehatEncounterId: body.satusehat_encounter_id || body.satusehatEncounterId || null,
         satusehatServiceRequestId: body.satusehat_service_request_id || body.satusehatServiceRequestId || null
       });
       

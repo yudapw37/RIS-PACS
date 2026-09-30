@@ -55,6 +55,7 @@
           <thead>
             <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
               <th class="px-6 py-3.5 text-left">MRN & Pasien</th>
+              <th class="px-6 py-3.5 text-left">Tanggal Order</th>
               <th class="px-6 py-3.5 text-left">Pemeriksaan</th>
               <th class="px-6 py-3.5 text-left">Prioritas</th>
               <th class="px-6 py-3.5 text-left">Status</th>
@@ -67,6 +68,14 @@
                 <div class="font-bold text-slate-800 dark:text-slate-100">{{ w.patient?.fullName }}</div>
                 <div class="text-xs text-slate-500 mt-0.5">
                   <span class="font-mono bg-cyan-50 dark:bg-cyan-900/40 text-cyan-600 px-1.5 rounded">{{ w.patient?.mrn }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="font-medium text-slate-700 dark:text-slate-300 text-xs">
+                  {{ formatDateTime(w.orderDate).date }}
+                </div>
+                <div class="text-[11px] text-slate-400 font-mono mt-0.5">
+                  {{ formatDateTime(w.orderDate).time }}
                 </div>
               </td>
               <td class="px-6 py-4">
@@ -418,6 +427,21 @@ const toastType = ref<'success' | 'error'>('success')
 const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
   toastMessage.value = msg; toastType.value = type
   setTimeout(() => toastMessage.value = '', 3000)
+}
+
+const formatDateTime = (val: any) => {
+  if (!val) return { date: '-', time: '' }
+  try {
+    const s = String(val).replace(' ', 'T')
+    const d = new Date(s)
+    if (isNaN(d.getTime())) return { date: '-', time: '' }
+    return {
+      date: d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      time: d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+    }
+  } catch {
+    return { date: '-', time: '' }
+  }
 }
 
 const form = ref({

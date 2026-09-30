@@ -72,6 +72,7 @@ export class PatientService {
       mrn: data.mrn,
       fullName: data.fullName,
       nik: data.nik || null,
+      ihsNumber: data.ihsNumber || null,
       gender: normalizedGender,
       dob: dobValue || null
     };

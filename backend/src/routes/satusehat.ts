@@ -12,6 +12,11 @@ export const satusehatRoutes = new Elysia({ prefix: "/api/satusehat" })
       serviceRequestId: t.String()
     })
   })
+  .put("/orders/:orderId/encounter-id", SatusehatController.updateEncounterIdHandler, {
+    body: t.Object({
+      encounterId: t.String()
+    })
+  })
   .post("/retry-log/:logId", SatusehatController.retryLogHandler)
   .post("/lookup-patient-ihs/:patientId", SatusehatController.lookupPatientIhsHandler, {
     body: t.Optional(t.Object({

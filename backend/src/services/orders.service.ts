@@ -158,6 +158,9 @@ export class OrderService {
       priority: orders.priority,
       status: orders.status,
       orderDate: orders.orderDate,
+      examFinishedAt: orders.examFinishedAt,
+      satusehatStatus: orders.satusehatStatus,
+      satusehatReportId: orders.satusehatReportId,
       patient: {
         mrn: patients.mrn,
         fullName: patients.fullName,
@@ -167,7 +170,9 @@ export class OrderService {
         fullName: doctors.fullName,
       },
       expertise: {
-        id: expertise.id
+        id: expertise.id,
+        conclusions: expertise.conclusions,
+        createdAt: expertise.createdAt
       }
     })
     .from(orders)
@@ -195,6 +200,7 @@ export class OrderService {
       priority: orders.priority,
       status: orders.status,
       orderDate: orders.orderDate,
+      examFinishedAt: orders.examFinishedAt,
       patient: {
         mrn: patients.mrn,
         fullName: patients.fullName,
@@ -362,8 +368,10 @@ export class OrderService {
       orderDate: orders.orderDate,
       studyInstanceUid: orders.studyInstanceUid,
       satusehatStatus: orders.satusehatStatus,
+      satusehatEncounterId: orders.satusehatEncounterId,
       satusehatServiceRequestId: orders.satusehatServiceRequestId,
       satusehatStudyId: orders.satusehatStudyId,
+      satusehatObservationId: orders.satusehatObservationId,
       satusehatReportId: orders.satusehatReportId,
       patient: {
         mrn: patients.mrn,

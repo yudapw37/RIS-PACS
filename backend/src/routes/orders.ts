@@ -41,7 +41,9 @@ export const orderRoutes = new Elysia({ prefix: "/api/orders" })
         t.Literal("ROUTINE"), t.Literal("URGENT"), t.Literal("STAT")
       ])),
       satusehat_service_request_id: t.Optional(t.String()),
-      satusehatServiceRequestId: t.Optional(t.String())
+      satusehatServiceRequestId: t.Optional(t.String()),
+      satusehat_encounter_id: t.Optional(t.String()),
+      satusehatEncounterId: t.Optional(t.String())
     })
   })
   .get("/:id", OrderController.getDetailsHandler)
