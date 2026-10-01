@@ -320,9 +320,9 @@
 
       </div>
 
-      <!-- Bottom User Profile Floating Card -->
-      <div class="p-3 border-t border-white/[0.08] bg-white/[0.02] shrink-0">
-        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/40 hover:bg-white/[0.07] transition-all group">
+      <!-- Bottom User Profile Card (No top border line, no logout button) -->
+      <div class="p-3 shrink-0">
+        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/30 transition-all">
           <div class="relative shrink-0">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-cyan-500 to-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-cyan-500/20 border border-cyan-400/30">
               {{ userInitials }}
@@ -333,20 +333,11 @@
           <div v-show="!isCollapsed || isMobileSidebarOpen" class="flex-1 min-w-0 transition-opacity duration-200">
             <p class="text-xs font-bold text-white truncate">{{ userName }}</p>
             <div class="flex items-center gap-1.5 mt-0.5">
-              <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 truncate">
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 truncate">
                 {{ userRole }}
               </span>
             </div>
           </div>
-
-          <button 
-            v-show="!isCollapsed || isMobileSidebarOpen"
-            @click="logout" 
-            title="Keluar / Logout" 
-            class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/15 transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          </button>
         </div>
       </div>
     </aside>
