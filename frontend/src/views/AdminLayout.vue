@@ -111,29 +111,49 @@
               <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Dokter Radiologi</span>
             </router-link>
 
-            <router-link 
-              to="/admin/modalities" 
-              active-class="sidebar-active" 
-              class="sidebar-link group"
-              :title="isCollapsed ? 'Alat & Modality' : ''"
-            >
-              <div class="sidebar-icon-box text-indigo-400 group-hover:text-indigo-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              </div>
-              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Alat & Modality</span>
-            </router-link>
+            <!-- Parent: Alat & Modality (collapsible sub-menu) -->
+            <div>
+              <button
+                @click="isModalityExpanded = !isModalityExpanded"
+                :class="['sidebar-link group w-full text-left justify-between', isModalityActive ? 'sidebar-active' : '']"
+                :title="isCollapsed ? 'Alat & Modality' : ''"
+              >
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="sidebar-icon-box text-indigo-400 group-hover:text-indigo-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  </div>
+                  <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Alat & Modality</span>
+                </div>
+                <svg 
+                  v-show="!isCollapsed || isMobileSidebarOpen"
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="14" 
+                  height="14" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  stroke-width="2.5" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  :class="['transition-transform duration-200 text-slate-400 shrink-0', isModalityExpanded ? 'rotate-180 text-cyan-400' : '']"
+                >
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
 
-            <router-link 
-              to="/admin/modality-logs" 
-              active-class="sidebar-active" 
-              class="sidebar-link group"
-              :title="isCollapsed ? 'Log Modality (PACS)' : ''"
-            >
-              <div class="sidebar-icon-box text-slate-400 group-hover:text-slate-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <!-- Sub-items for Modality -->
+              <div v-if="isModalityExpanded && (!isCollapsed || isMobileSidebarOpen)" class="ml-4 mt-1.5 space-y-1 border-l-2 border-indigo-500/30 pl-3">
+                <router-link to="/admin/modalities" active-class="sidebar-sub-active" class="sidebar-sub-link group">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  <span>Daftar Modality</span>
+                </router-link>
+
+                <router-link to="/admin/modality-logs" active-class="sidebar-sub-active" class="sidebar-sub-link group">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <span>Log Modality (PACS)</span>
+                </router-link>
               </div>
-              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Log Modality (PACS)</span>
-            </router-link>
+            </div>
           </div>
         </div>
 
@@ -599,14 +619,19 @@ const pageMeta = computed(() => {
   return { title: 'Pusat Informasi RIS', category: 'Portal' }
 })
 
-// Order sub-menu expansion state
+// Sub-menu expansion states
 const orderRoutes = ['/admin/orders', '/admin/examination-worklist', '/admin/expertise-worklist']
 const isOrderActive = computed(() => orderRoutes.some(r => route.path.startsWith(r)))
 const isOrderExpanded = ref(true)
 
-// Auto-expand order menu if on an order route
+const modalityRoutes = ['/admin/modalities', '/admin/modality-logs']
+const isModalityActive = computed(() => modalityRoutes.some(r => route.path.startsWith(r)))
+const isModalityExpanded = ref(true)
+
+// Auto-expand menus if on their corresponding routes
 watch(() => route.path, (path) => {
   if (orderRoutes.some(r => path.startsWith(r))) isOrderExpanded.value = true
+  if (modalityRoutes.some(r => path.startsWith(r))) isModalityExpanded.value = true
   if (window.innerWidth < 1024) isMobileSidebarOpen.value = false
 }, { immediate: true })
 
