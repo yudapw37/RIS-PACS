@@ -4,8 +4,8 @@
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
       <div>
         <div class="flex items-center gap-2">
-          <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-            Audit SPM & Mutu Layanan
+          <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300">
+            Mutu Layanan
           </span>
           <span class="text-xs text-slate-400">Turnaround Time (TAT)</span>
         </div>
@@ -42,7 +42,7 @@
     </div>
 
     <!-- KPI Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <!-- 1. Antre Masuk -->
       <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
         <div class="flex items-center justify-between mb-3">
@@ -102,28 +102,11 @@
         <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mt-1">Rata-rata Total Waktu</div>
         <div class="text-[10px] text-slate-500 mt-1">Order ➔ Hasil Jadi Selesai</div>
       </div>
-
-      <!-- 5. Kepatuhan SPM -->
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
-        <div class="flex items-center justify-between mb-3">
-          <div :class="summary.complianceRate >= 80 ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600' : 'bg-rose-50 dark:bg-rose-950/50 text-rose-600'" class="w-10 h-10 rounded-2xl flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <span :class="summary.complianceRate >= 80 ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'text-rose-500 bg-rose-50 dark:bg-rose-900/30'" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-current border-opacity-15">
-            {{ summary.complianceRate }}%
-          </span>
-        </div>
-        <div class="text-2xl font-black text-slate-800 dark:text-slate-100 tabular-nums">
-          {{ summary.compliantCount }} <span class="text-sm font-semibold text-slate-400">/ {{ summary.completedCount }}</span>
-        </div>
-        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mt-1">Kepatuhan Standar SPM</div>
-        <div class="text-[10px] text-slate-500 mt-1">CITO &le;60m | Rutin &le;180m</div>
-      </div>
     </div>
 
     <!-- Filter & Search Controls -->
     <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
         <!-- Date From -->
         <div>
           <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Dari Tanggal</label>
@@ -138,28 +121,6 @@
           <div class="flex items-center px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
             <input type="date" v-model="filter.to" @change="fetchData" class="w-full text-xs font-bold bg-transparent border-none focus:ring-0 text-slate-700 dark:text-slate-200 p-0" />
           </div>
-        </div>
-
-        <!-- Priority Filter -->
-        <div>
-          <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Prioritas</label>
-          <select v-model="filter.priority" @change="fetchData" class="w-full text-xs font-bold px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-cyan-500">
-            <option value="all">Semua Prioritas</option>
-            <option value="routine">Rutin (Standar &le; 180 Menit)</option>
-            <option value="urgent">Urgent / CITO (&le; 60 Menit)</option>
-            <option value="stat">STAT / Darurat (&le; 60 Menit)</option>
-          </select>
-        </div>
-
-        <!-- Compliance Filter -->
-        <div>
-          <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Kepatuhan SPM</label>
-          <select v-model="filter.compliance" @change="fetchData" class="w-full text-xs font-bold px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 focus:ring-1 focus:ring-cyan-500">
-            <option value="all">Semua Status Kepatuhan</option>
-            <option value="compliant">✅ Tepat Waktu (Memenuhi SPM)</option>
-            <option value="overtime">⚠️ Melebihi Standar (Overtime)</option>
-            <option value="in_progress">⏳ Sedang Dalam Pelayanan</option>
-          </select>
         </div>
 
         <!-- Search Input -->
@@ -222,7 +183,6 @@
               <th class="px-4 py-3.5 text-center">Mulai ➔ Selesai</th>
               <th class="px-4 py-3.5 text-center">Ekspertise Selesai</th>
               <th class="px-4 py-3.5 text-center bg-indigo-50/40 dark:bg-indigo-950/20 font-extrabold text-indigo-600 dark:text-indigo-400">Total Waktu (TAT)</th>
-              <th class="px-4 py-3.5 text-center">Status SPM</th>
               <th class="px-5 py-3.5 text-right">Detail</th>
             </tr>
           </thead>
@@ -291,32 +251,6 @@
                   {{ formatMinutes(item.totalTatMinutes) }}
                 </span>
                 <span v-else class="text-slate-300 dark:text-slate-600 text-[10px] italic">Sedang berjalan</span>
-              </td>
-
-              <!-- Status SPM -->
-              <td class="px-4 py-3.5 text-center whitespace-nowrap">
-                <span 
-                  v-if="item.complianceStatus === 'compliant'"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Tepat Waktu
-                </span>
-                <span 
-                  v-else-if="item.complianceStatus === 'overtime'"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200 dark:border-rose-800"
-                  :title="`Melebihi target SPM ${item.spmTargetMinutes} menit`"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                  Overtime
-                </span>
-                <span 
-                  v-else
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                  Dalam Proses
-                </span>
               </td>
 
               <!-- Detail Action -->
@@ -447,8 +381,8 @@
             <div class="text-xl font-black text-indigo-600 dark:text-indigo-400">{{ formatMinutes(selectedItem.totalTatMinutes) }}</div>
           </div>
           <div class="text-right">
-            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Target SPM Kemenkes</div>
-            <div class="text-xs font-bold text-slate-700 dark:text-slate-200">&le; {{ selectedItem.spmTargetMinutes }} Menit</div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status Layanan</div>
+            <div class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ selectedItem.totalTatMinutes !== null ? 'Selesai Lengkap' : 'Sedang Berjalan' }}</div>
           </div>
         </div>
 
@@ -472,8 +406,6 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 const filter = ref({
   from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   to: new Date().toISOString().split('T')[0],
-  priority: 'all',
-  compliance: 'all',
   search: ''
 })
 
@@ -516,8 +448,6 @@ const fetchData = async () => {
     const params: any = {
       from: filter.value.from,
       to: filter.value.to,
-      priority: filter.value.priority,
-      compliance: filter.value.compliance,
       search: filter.value.search,
       page: pagination.value.page,
       limit: pagination.value.limit
@@ -596,8 +526,7 @@ const exportCsv = () => {
     'Waktu Antre Masuk (Menit)',
     'Durasi Tindakan (Menit)',
     'Waktu Tunggu Baca (Menit)',
-    'Total TAT (Menit)',
-    'Status Kepatuhan SPM'
+    'Total TAT (Menit)'
   ]
 
   const csvRows = rows.value.map(r => [
@@ -616,8 +545,7 @@ const exportCsv = () => {
     r.waitTimeExamMinutes ?? '',
     r.examDurationMinutes ?? '',
     r.waitTimeExpertiseMinutes ?? '',
-    r.totalTatMinutes ?? '',
-    `"${r.complianceStatus === 'compliant' ? 'Tepat Waktu' : r.complianceStatus === 'overtime' ? 'Overtime' : 'Dalam Proses'}"`
+    r.totalTatMinutes ?? ''
   ])
 
   const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...csvRows.map(e => e.join(','))].join('\n')
