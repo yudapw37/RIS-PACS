@@ -1,106 +1,189 @@
 <template>
-  <div class="h-screen w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex overflow-hidden font-sans">
+  <!-- Main Viewport with Ambient Cosmic Medical Background -->
+  <div class="h-screen w-full bg-[#030712] text-slate-100 flex p-3 lg:p-4 gap-3.5 lg:gap-4 overflow-hidden relative font-sans select-none antialiased">
     
-    <!-- Mobile Backdrop -->
+    <!-- Ambient Radial Glow Lights behind Floating Glass Cards -->
+    <div class="absolute -top-32 -left-20 w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/15 via-sky-500/10 to-transparent rounded-full blur-[140px] pointer-events-none z-0"></div>
+    <div class="absolute -bottom-32 right-10 w-[700px] h-[700px] bg-gradient-to-tr from-blue-600/15 via-indigo-600/10 to-transparent rounded-full blur-[160px] pointer-events-none z-0"></div>
+    <div class="absolute top-1/2 left-1/3 w-[450px] h-[450px] bg-teal-500/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+    <!-- Mobile Drawer Overlay Backdrop -->
     <div 
-      v-if="isSidebarOpen" 
-      @click="isSidebarOpen = false" 
-      class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 lg:hidden"
+      v-if="isMobileSidebarOpen" 
+      @click="isMobileSidebarOpen = false" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-md z-40 lg:hidden transition-opacity duration-300"
     ></div>
 
-    <!-- Sidebar / Navigasi (Sleek Dark Theme) -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- FLOATING SIDEBAR ISLAND                                           -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
     <aside 
       :class="[
-        'w-68 lg:w-72 bg-[#091122] border-r border-slate-800/80 flex flex-col transition-all duration-300 fixed lg:relative z-40 h-full select-none shadow-2xl lg:shadow-none',
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        'h-full rounded-3xl bg-slate-900/80 dark:bg-[#070e1d]/85 backdrop-blur-2xl border border-white/10 dark:border-cyan-500/20 shadow-2xl flex flex-col transition-all duration-300 z-50 shrink-0 relative overflow-hidden',
+        // Desktop width states
+        isCollapsed ? 'lg:w-[84px]' : 'lg:w-72',
+        // Mobile fixed drawer states
+        isMobileSidebarOpen 
+          ? 'fixed top-3 bottom-3 left-3 w-[290px] translate-x-0 shadow-2xl' 
+          : 'fixed top-3 bottom-3 left-3 w-[290px] -translate-x-[110%] lg:translate-x-0 lg:static'
       ]"
     >
-      <!-- Top Branding Logo Area -->
-      <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/80 shrink-0 bg-[#070e1b]">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-600 via-cyan-500 to-blue-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-cyan-500/25 border border-cyan-400/30">
-            R
+      <!-- Top Branding Area -->
+      <div class="h-20 flex items-center justify-between px-5 border-b border-white/[0.08] shrink-0 bg-white/[0.02]">
+        <div class="flex items-center gap-3 min-w-0">
+          <!-- Radiology Aperture Logo Icon -->
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 via-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30 border border-cyan-300/40 shrink-0 group cursor-pointer relative overflow-hidden">
+            <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <!-- High-tech Aperture / Pulse Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-sm animate-pulse-slow">
+              <circle cx="12" cy="12" r="10" stroke-width="1.8" stroke-dasharray="4 2"/>
+              <path d="M12 2a10 10 0 0 1 10 10"/>
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 9v6m-3-3h6"/>
+            </svg>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="font-black text-lg tracking-tight text-white">Smart<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">RIS</span></span>
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">v3.5</span>
+
+          <!-- Brand Text (Hidden when collapsed on desktop) -->
+          <div v-show="!isCollapsed || isMobileSidebarOpen" class="min-w-0 transition-opacity duration-200">
+            <div class="flex items-center gap-1.5">
+              <span class="font-black text-lg tracking-tight text-white">Smart<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">RIS</span></span>
+              <span class="px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm">v3.5</span>
             </div>
-            <p class="text-[10px] font-medium text-slate-400 tracking-wide">PACS & Radiology System</p>
+            <p class="text-[10px] font-semibold text-slate-400 tracking-wide truncate">PACS & Radiology Network</p>
           </div>
         </div>
 
         <!-- Mobile Close Button -->
-        <button @click="isSidebarOpen = false" class="lg:hidden p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+        <button 
+          @click="isMobileSidebarOpen = false" 
+          class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-      
-      <!-- Navigasi Links -->
-      <div class="flex-1 overflow-y-auto px-4 py-5 space-y-6 scrollbar-thin">
+
+      <!-- Navigation Links Container -->
+      <div class="flex-1 overflow-y-auto px-3.5 py-4 space-y-5 scrollbar-thin">
 
         <!-- Group: Dashboard -->
         <div>
-          <p class="sidebar-group-title">Dashboard</p>
+          <p v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-group-title">Menu Utama</p>
           <div class="space-y-1">
-            <router-link to="/admin" exact-active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-              <span>Dashboard Utama</span>
+            <router-link 
+              to="/admin" 
+              exact-active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Dashboard Utama' : ''"
+            >
+              <div class="sidebar-icon-box text-cyan-400 group-hover:text-cyan-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Dashboard Utama</span>
             </router-link>
           </div>
         </div>
 
         <!-- Group: Master Data -->
         <div>
-          <p class="sidebar-group-title">Master Data</p>
+          <p v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-group-title">Master Data</p>
           <div class="space-y-1">
-            <router-link to="/admin/patients" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-cyan-400"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              <span>Data Pasien</span>
+            <router-link 
+              to="/admin/patients" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Data Pasien' : ''"
+            >
+              <div class="sidebar-icon-box text-teal-400 group-hover:text-teal-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Data Pasien</span>
             </router-link>
-            <router-link to="/admin/doctors" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-blue-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>Dokter Radiologi</span>
+
+            <router-link 
+              to="/admin/doctors" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Dokter Radiologi' : ''"
+            >
+              <div class="sidebar-icon-box text-blue-400 group-hover:text-blue-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Dokter Radiologi</span>
             </router-link>
-            <router-link to="/admin/modalities" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-indigo-400"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              <span>Alat & Modality</span>
+
+            <router-link 
+              to="/admin/modalities" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Alat & Modality' : ''"
+            >
+              <div class="sidebar-icon-box text-indigo-400 group-hover:text-indigo-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Alat & Modality</span>
             </router-link>
-            <router-link to="/admin/modality-logs" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-slate-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span>Log Modality (PACS)</span>
+
+            <router-link 
+              to="/admin/modality-logs" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Log Modality (PACS)' : ''"
+            >
+              <div class="sidebar-icon-box text-slate-400 group-hover:text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Log Modality (PACS)</span>
             </router-link>
           </div>
         </div>
 
-        <!-- Group: Order -->
+        <!-- Group: Order & Worklist -->
         <div>
-          <p class="sidebar-group-title">Manajemen Order</p>
+          <p v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-group-title">Pelayanan Radiologi</p>
           <div class="space-y-1">
             <!-- Parent: Manajemen Order (collapsible) -->
             <div>
               <button
                 @click="isOrderExpanded = !isOrderExpanded"
                 :class="['sidebar-link group w-full text-left justify-between', isOrderActive ? 'sidebar-active' : '']"
+                :title="isCollapsed ? 'Alur Kerja Radiologi' : ''"
               >
-                <div class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-amber-400"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-                  <span>Alur Kerja Radiologi</span>
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="sidebar-icon-box text-amber-400 group-hover:text-amber-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+                  </div>
+                  <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Alur Order Radiologi</span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" :class="['transition-transform duration-200 text-slate-400', isOrderExpanded ? 'rotate-180' : '']"><polyline points="6 9 12 15 18 9"/></svg>
+                <svg 
+                  v-show="!isCollapsed || isMobileSidebarOpen"
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="14" 
+                  height="14" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  stroke-width="2.5" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  :class="['transition-transform duration-200 text-slate-400 shrink-0', isOrderExpanded ? 'rotate-180 text-cyan-400' : '']"
+                >
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
               </button>
 
               <!-- Sub-items -->
-              <div v-if="isOrderExpanded" class="ml-3 mt-1.5 space-y-1 border-l-2 border-slate-800/80 pl-3">
+              <div v-if="isOrderExpanded && (!isCollapsed || isMobileSidebarOpen)" class="ml-4 mt-1.5 space-y-1 border-l-2 border-cyan-500/30 pl-3">
                 <router-link to="/admin/orders" active-class="sidebar-sub-active" class="sidebar-sub-link group">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                   <span>Semua Order</span>
                 </router-link>
+
                 <router-link to="/admin/examination-worklist" active-class="sidebar-sub-active" class="sidebar-sub-link group">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                   <span>Antrean Tindakan</span>
-                  <span class="ml-auto w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                  <span class="ml-auto w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
                 </router-link>
+
                 <router-link to="/admin/expertise-worklist" active-class="sidebar-sub-active" class="sidebar-sub-link group">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                   <span>Antrean Ekspertise</span>
@@ -109,211 +192,391 @@
               </div>
             </div>
 
-            <router-link to="/admin/history" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-slate-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>Riwayat / History Order</span>
+            <router-link 
+              to="/admin/history" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Riwayat Order' : ''"
+            >
+              <div class="sidebar-icon-box text-slate-400 group-hover:text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Riwayat Order Selesai</span>
             </router-link>
           </div>
         </div>
 
-        <!-- Group: Report -->
+        <!-- Group: Laporan -->
         <div>
-          <p class="sidebar-group-title">Laporan & Audit</p>
+          <p v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-group-title">Laporan & Evaluasi</p>
           <div class="space-y-1">
-            <router-link to="/admin/reports" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-emerald-400"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-              <span>Laporan Statistik</span>
+            <router-link 
+              to="/admin/reports" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Laporan Statistik' : ''"
+            >
+              <div class="sidebar-icon-box text-emerald-400 group-hover:text-emerald-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Laporan Statistik</span>
             </router-link>
-            <router-link to="/admin/reports/waiting-time" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-amber-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>Waktu Tunggu Pasien</span>
-              <span class="ml-auto px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">TAT</span>
+
+            <router-link 
+              to="/admin/reports/waiting-time" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Waktu Tunggu Pasien' : ''"
+            >
+              <div class="sidebar-icon-box text-amber-400 group-hover:text-amber-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Waktu Tunggu Pasien</span>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="ml-auto px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">TAT</span>
             </router-link>
           </div>
         </div>
 
         <!-- Group: Interoperabilitas -->
         <div>
-          <p class="sidebar-group-title">Interoperabilitas</p>
+          <p v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-group-title">Integrasi Nasional</p>
           <div class="space-y-1">
-            <router-link to="/admin/satusehat" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-teal-400"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span>SATUSEHAT Gateway</span>
-              <span class="ml-auto px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30">FHIR</span>
+            <router-link 
+              to="/admin/satusehat" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'SATUSEHAT Gateway' : ''"
+            >
+              <div class="sidebar-icon-box text-teal-400 group-hover:text-teal-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">SATUSEHAT Gateway</span>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="ml-auto px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/40">FHIR</span>
             </router-link>
-            <router-link to="/admin/api-docs" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-cyan-400"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              <span>Dokumentasi API SIMRS</span>
+
+            <router-link 
+              to="/admin/api-docs" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Dokumentasi API SIMRS' : ''"
+            >
+              <div class="sidebar-icon-box text-cyan-400 group-hover:text-cyan-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Dokumentasi API SIMRS</span>
             </router-link>
           </div>
         </div>
 
         <!-- Group: Sistem -->
         <div>
-          <p class="sidebar-group-title">Sistem</p>
+          <p v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-group-title">Sistem & Bantuan</p>
           <div class="space-y-1">
-            <router-link to="/admin/system-info" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-indigo-400"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-              <span>Info Server & PACS</span>
+            <router-link 
+              to="/admin/system-info" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Info Server & PACS' : ''"
+            >
+              <div class="sidebar-icon-box text-indigo-400 group-hover:text-indigo-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Info Server & PACS</span>
             </router-link>
-            <router-link to="/admin/helpdesk" active-class="sidebar-active" class="sidebar-link group">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-icon text-slate-400"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Panduan Penggunaan</span>
+
+            <router-link 
+              to="/admin/helpdesk" 
+              active-class="sidebar-active" 
+              class="sidebar-link group"
+              :title="isCollapsed ? 'Panduan Penggunaan' : ''"
+            >
+              <div class="sidebar-icon-box text-violet-400 group-hover:text-violet-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <span v-show="!isCollapsed || isMobileSidebarOpen" class="sidebar-link-text">Panduan Penggunaan</span>
             </router-link>
           </div>
         </div>
 
       </div>
 
-      <!-- Bottom User Profile Card -->
-      <div class="p-4 border-t border-slate-800/80 bg-[#070e1b] shrink-0">
-        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-slate-700 transition-all">
-          <div class="relative flex-shrink-0">
+      <!-- Bottom User Profile Floating Card -->
+      <div class="p-3 border-t border-white/[0.08] bg-white/[0.02] shrink-0">
+        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] hover:border-cyan-500/40 hover:bg-white/[0.07] transition-all group">
+          <div class="relative shrink-0">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-cyan-500 to-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-cyan-500/20 border border-cyan-400/30">
               {{ userInitials }}
             </div>
-            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-slate-900" title="Status: Online"></span>
+            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-slate-900 animate-pulse" title="Status: Online"></span>
           </div>
-          <div class="flex-1 min-w-0">
+
+          <div v-show="!isCollapsed || isMobileSidebarOpen" class="flex-1 min-w-0 transition-opacity duration-200">
             <p class="text-xs font-bold text-white truncate">{{ userName }}</p>
-            <p class="text-[10px] font-medium text-cyan-300 truncate">{{ userRole }}</p>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 truncate">
+                {{ userRole }}
+              </span>
+            </div>
           </div>
+
           <button 
+            v-show="!isCollapsed || isMobileSidebarOpen"
             @click="logout" 
             title="Keluar / Logout" 
-            class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition-colors"
+            class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/15 transition-all"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           </button>
         </div>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
-      <!-- Modern Topbar / Header -->
-      <header class="h-20 bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between px-6 lg:px-10 z-10 sticky top-0 shrink-0">
-        <!-- Left: Mobile Toggle & Dynamic Breadcrumb Navigation -->
-        <div class="flex items-center gap-4 min-w-0">
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- MAIN WORKSPACE: FLOATING HEADER & CONTENT ISLAND                  -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative z-10">
+
+      <!-- FLOATING HEADER CAPSULE -->
+      <header class="h-16 lg:h-18 rounded-2xl bg-slate-900/80 dark:bg-[#070e1d]/85 backdrop-blur-2xl border border-white/10 dark:border-cyan-500/20 shadow-xl px-5 lg:px-6 flex items-center justify-between shrink-0 mb-3.5 relative z-20">
+        
+        <!-- Left: Mobile Toggle, Desktop Collapse, Dynamic Breadcrumb -->
+        <div class="flex items-center gap-3.5 min-w-0">
+          
+          <!-- Mobile Menu Trigger Button -->
           <button 
-            @click="isSidebarOpen = true" 
-            class="lg:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors"
+            @click="isMobileSidebarOpen = true" 
+            class="lg:hidden p-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white transition-colors"
             title="Buka Menu"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+
+          <!-- Desktop Sidebar Collapse Toggle -->
+          <button 
+            @click="isCollapsed = !isCollapsed" 
+            class="hidden lg:flex p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-300 border border-white/5 transition-all"
+            :title="isCollapsed ? 'Perlebar Sidebar' : 'Persempit Sidebar'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" :class="['transition-transform duration-200', isCollapsed ? 'rotate-180 text-cyan-400' : '']">
+              <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9-3 3 3 3"/>
+            </svg>
           </button>
 
           <!-- Dynamic Title & Category Breadcrumb -->
           <div class="min-w-0">
-            <div class="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               <span>SmartRIS</span>
-              <span class="text-slate-300 dark:text-slate-600">&bull;</span>
-              <span class="text-cyan-600 dark:text-cyan-400">{{ pageMeta.category }}</span>
+              <span class="text-slate-600">&bull;</span>
+              <span class="text-cyan-400">{{ pageMeta.category }}</span>
             </div>
-            <h1 class="text-lg lg:text-xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight leading-tight truncate">
+            <h1 class="text-base lg:text-lg font-black text-white tracking-tight leading-tight truncate">
               {{ pageMeta.title }}
             </h1>
           </div>
         </div>
 
-        <!-- Center: Live Healthcare Server Status Badges -->
-        <div class="hidden xl:flex items-center gap-2.5">
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/70 dark:border-emerald-800/60 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>DCM4CHEE PACS Online</span>
+        <!-- Center: Interactive Quick Search & Realtime Clock -->
+        <div class="hidden md:flex items-center gap-4">
+          <!-- Quick Search Bar -->
+          <div class="relative w-64 lg:w-80 group">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cyan-400 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <input 
+              v-model="quickSearchQuery"
+              @keydown.enter="handleQuickSearch"
+              type="text" 
+              placeholder="Cari pasien, no. RM, order..." 
+              class="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-slate-900 border border-white/10 focus:border-cyan-500/50 rounded-xl pl-9 pr-14 py-1.5 text-xs text-white placeholder-slate-400 outline-none transition-all shadow-inner"
+            />
+            <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+              <span class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white/10 text-slate-300 rounded border border-white/10">⌘K</span>
+            </div>
           </div>
-          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200/70 dark:border-cyan-800/60 text-[11px] font-bold text-cyan-700 dark:text-cyan-300 shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
-            <span>SATUSEHAT Ready</span>
+
+          <!-- Real-Time WIB Digital Clock -->
+          <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-bold text-slate-300 font-mono shadow-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span>{{ currentTimeWIB }}</span>
           </div>
         </div>
 
-        <!-- Right: Action Controls -->
-        <div class="flex items-center space-x-2.5 lg:space-x-3.5">
-          <!-- Dark Mode Toggle Button -->
+        <!-- Right: Server Status Pills, Dark Toggle, and Action Buttons -->
+        <div class="flex items-center space-x-2.5 lg:space-x-3 shrink-0">
+          
+          <!-- Healthcare Server Status Badges -->
+          <div class="hidden 2xl:flex items-center gap-2">
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>DCM4CHEE PACS</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[10px] font-bold text-cyan-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+              <span>SATUSEHAT</span>
+            </div>
+          </div>
+
+          <!-- Quick Action: Order Baru Button -->
+          <router-link 
+            to="/admin/orders" 
+            class="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-cyan-500/25 active:scale-95 transition-all"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Order Baru</span>
+          </router-link>
+
+          <!-- Dark/Light Mode Switcher -->
           <button 
             @click="toggleTheme" 
             :title="isDark ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'" 
-            class="relative p-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white bg-slate-100 hover:bg-slate-200/70 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-all shadow-sm"
+            class="p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all shadow-sm"
           >
-            <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           </button>
 
           <!-- Notification Bell -->
-          <div class="relative p-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white bg-slate-100 hover:bg-slate-200/70 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl transition-all cursor-pointer hidden sm:flex shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            <span class="absolute top-2 right-2 w-2 h-2 bg-cyan-500 rounded-full animate-ping"></span>
-            <span class="absolute top-2 right-2 w-2 h-2 bg-cyan-500 rounded-full"></span>
+          <div class="relative p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all cursor-pointer shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full"></span>
           </div>
 
-          <div class="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
+          <div class="w-px h-5 bg-white/10"></div>
 
           <!-- Logout Button -->
           <button 
             @click="logout" 
             title="Keluar dari Akun" 
-            class="flex items-center gap-2 py-2 px-3.5 text-rose-600 dark:text-rose-400 hover:text-white bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-600 dark:hover:bg-rose-600 rounded-xl border border-rose-200/70 dark:border-rose-900/50 transition-all font-extrabold text-xs shadow-sm group"
+            class="flex items-center gap-1.5 py-1.5 px-3 text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-600 rounded-xl border border-rose-500/30 transition-all font-bold text-xs group"
           >
             <span class="hidden md:inline">Keluar</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-0.5 transition-transform"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-0.5 transition-transform"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           </button>
         </div>
       </header>
 
-      <!-- Page Content / RouterView -->
-      <div class="flex-1 overflow-y-auto p-4 lg:p-8 relative bg-slate-50 dark:bg-slate-950">
-        <!-- Welcome Widget (On /admin root) -->
-        <div v-if="$route.path === '/admin'" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div class="glass p-8 lg:p-10 rounded-3xl mb-8 relative overflow-hidden bg-white dark:bg-slate-900 hover:shadow-lg transition-shadow duration-500 border border-slate-100 dark:border-slate-800">
-            <div class="relative z-10 max-w-2xl">
-              <span class="inline-block py-1 px-3 rounded-full bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-widest uppercase mb-3 shadow-sm border border-emerald-100 dark:border-emerald-800/50">Status Sistem Normal</span>
-              <h2 class="text-2xl lg:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight mb-3">Infrastruktur Radiologi Terkoneksi Lancar</h2>
-              <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6 text-sm lg:text-base">Modality MRI dan CT Scan pada server DCM4CHEE PACS merespon <span class="font-bold text-slate-700 dark:text-slate-200">DICOM Ping (C-ECHO)</span> secara stabil dan terhubung ke Gateway SATUSEHAT.</p>
-              <div class="flex flex-col sm:flex-row gap-3">
-                <router-link to="/admin/examination-worklist" class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-[0_4px_14px_0_rgba(11,75,111,0.39)] transition-all active:scale-95 text-center">
-                  Buka Antrean Worklist
+      <!-- FLOATING WORKSPACE CONTENT CARD -->
+      <div class="flex-1 rounded-3xl bg-slate-900/60 dark:bg-[#070e1d]/70 backdrop-blur-2xl border border-white/10 dark:border-cyan-500/15 shadow-2xl p-4 lg:p-7 overflow-y-auto relative scrollbar-thin">
+        
+        <!-- Welcome Hero Widget on /admin Root -->
+        <div v-if="$route.path === '/admin'" class="animate-in fade-in slide-in-from-bottom-3 duration-500 mb-8">
+          <div class="relative overflow-hidden rounded-3xl p-6 lg:p-8 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-[#070e1d]/90 border border-cyan-500/25 shadow-2xl">
+            <!-- Decorative Ambient Glow in Card -->
+            <div class="absolute -right-20 -top-20 w-80 h-80 bg-gradient-to-bl from-cyan-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 max-w-3xl">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-black uppercase tracking-wider border border-emerald-500/30">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Infrastruktur Aktif & Siap Melayani
+                </span>
+                <span class="hidden sm:inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-cyan-500/15 text-cyan-300 text-xs font-black uppercase tracking-wider border border-cyan-500/30">
+                  ⚡ C-ECHO DICOM OK
+                </span>
+              </div>
+
+              <h2 class="text-2xl lg:text-3xl font-black text-white tracking-tight mb-2">
+                Sistem Radiologi Terpadu <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">SmartRIS & PACS</span>
+              </h2>
+
+              <p class="text-slate-300 text-xs lg:text-sm font-medium leading-relaxed mb-6 max-w-2xl">
+                Server DCM4CHEE PACS terkoneksi dengan modality MRI, CT-Scan, dan X-Ray. Modul pembacaan ekspertise klinis, pemantauan waktu tunggu pasien (TAT), serta Gateway SATUSEHAT Kemenkes RI berjalan normal.
+              </p>
+
+              <div class="flex flex-wrap gap-3">
+                <router-link 
+                  to="/admin/examination-worklist" 
+                  class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-5 py-2.5 rounded-xl font-bold text-xs lg:text-sm shadow-lg shadow-cyan-500/25 active:scale-95 transition-all flex items-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <span>Buka Antrean Worklist</span>
                 </router-link>
-                <router-link to="/admin/satusehat" class="bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm border border-slate-200 dark:border-slate-700 transition-colors text-center">
-                  Cek Gateway SATUSEHAT
+
+                <router-link 
+                  to="/admin/expertise-worklist" 
+                  class="bg-white/10 hover:bg-white/15 text-white border border-white/10 px-5 py-2.5 rounded-xl font-bold text-xs lg:text-sm shadow-sm transition-all flex items-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <span>Antrean Ekspertise</span>
+                </router-link>
+
+                <router-link 
+                  to="/admin/satusehat" 
+                  class="bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border border-teal-500/30 px-5 py-2.5 rounded-xl font-bold text-xs lg:text-sm shadow-sm transition-all flex items-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <span>Kemenkes SATUSEHAT</span>
                 </router-link>
               </div>
-            </div>
-            
-            <!-- Decorative Pattern -->
-            <div class="absolute right-0 top-0 -mr-6 -mt-6 pointer-events-none">
-              <div class="w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
-              <div class="w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-10"></div>
             </div>
           </div>
         </div>
 
-        <!-- Default child route mapping -->
+        <!-- Render Child Router Views -->
         <div class="pb-10">
           <router-view></router-view>
         </div>
+
       </div>
+
     </main>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
 
-// Mobile sidebar & dark mode states
-const isSidebarOpen = ref(false)
-const isDark = ref(false)
+// Responsive & Collapse states
+const isMobileSidebarOpen = ref(false)
+const isCollapsed = ref(false)
+const isDark = ref(true)
 
 // User info from localStorage
 const userName = ref('Superadmin')
-const userRole = ref('Administrator IT')
+const userRole = ref('ADMINISTRATOR IT')
 const userInitials = computed(() => {
   return userName.value.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'SA'
 })
+
+// Quick Search query
+const quickSearchQuery = ref('')
+const handleQuickSearch = () => {
+  if (quickSearchQuery.value.trim()) {
+    router.push({ path: '/admin/orders', query: { q: quickSearchQuery.value.trim() } })
+  }
+}
+
+// Realtime WIB Clock
+const currentTimeWIB = ref('')
+let timerInterval: any = null
+
+const updateClock = () => {
+  const now = new Date()
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: 'Asia/Jakarta',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }
+  const timeStr = new Intl.DateTimeFormat('id-ID', options).format(now)
+  currentTimeWIB.value = `${timeStr} WIB`
+}
+
+// Keyboard shortcut listener (Ctrl+K or Cmd+K)
+const handleKeyDown = (e: KeyboardEvent) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    const input = document.querySelector('input[placeholder*="Cari pasien"]') as HTMLInputElement
+    if (input) input.focus()
+  }
+}
 
 // Dynamic Breadcrumb / Page Title Mapping
 const pageMeta = computed(() => {
@@ -324,10 +587,10 @@ const pageMeta = computed(() => {
   if (p.startsWith('/admin/modalities')) return { title: 'Alat & Modality Radiologi', category: 'Master Data' }
   if (p.startsWith('/admin/modality-logs')) return { title: 'Log Modality PACS', category: 'Master Data' }
   if (p.startsWith('/admin/orders')) return { title: 'Semua Order Pemeriksaan', category: 'Manajemen Order' }
-  if (p.startsWith('/admin/examination-worklist')) return { title: 'Antrean Pemeriksaan (Worklist)', category: 'Manajemen Order' }
-  if (p.startsWith('/admin/expertise-worklist')) return { title: 'Antrean Bacaan (Expertise)', category: 'Manajemen Order' }
+  if (p.startsWith('/admin/examination-worklist')) return { title: 'Antrean Pemeriksaan (Worklist)', category: 'Alur Kerja Radiologi' }
+  if (p.startsWith('/admin/expertise-worklist')) return { title: 'Antrean Bacaan (Expertise)', category: 'Alur Kerja Radiologi' }
   if (p.startsWith('/admin/history')) return { title: 'Riwayat & History Order', category: 'Manajemen Order' }
-  if (p.startsWith('/admin/reports/waiting-time')) return { title: 'Laporan Waktu Tunggu Pasien', category: 'Laporan & Mutu' }
+  if (p.startsWith('/admin/reports/waiting-time')) return { title: 'Laporan Waktu Tunggu Pasien (TAT)', category: 'Laporan & Mutu' }
   if (p.startsWith('/admin/reports')) return { title: 'Laporan Statistik Radiologi', category: 'Laporan & Mutu' }
   if (p.startsWith('/admin/satusehat')) return { title: 'SATUSEHAT Gateway Hub', category: 'Interoperabilitas' }
   if (p.startsWith('/admin/api-docs')) return { title: 'Dokumentasi API SIMRS', category: 'Interoperabilitas' }
@@ -336,18 +599,25 @@ const pageMeta = computed(() => {
   return { title: 'Pusat Informasi RIS', category: 'Portal' }
 })
 
-// Order sub-menu state
+// Order sub-menu expansion state
 const orderRoutes = ['/admin/orders', '/admin/examination-worklist', '/admin/expertise-worklist']
 const isOrderActive = computed(() => orderRoutes.some(r => route.path.startsWith(r)))
-const isOrderExpanded = ref(false)
+const isOrderExpanded = ref(true)
 
 // Auto-expand order menu if on an order route
 watch(() => route.path, (path) => {
   if (orderRoutes.some(r => path.startsWith(r))) isOrderExpanded.value = true
-  if (window.innerWidth < 1024) isSidebarOpen.value = false
+  if (window.innerWidth < 1024) isMobileSidebarOpen.value = false
 }, { immediate: true })
 
 onMounted(() => {
+  // Update live clock
+  updateClock()
+  timerInterval = setInterval(updateClock, 1000)
+
+  // Attach keyboard shortcut
+  window.addEventListener('keydown', handleKeyDown)
+
   // Load user info if available
   try {
     const rawUser = localStorage.getItem('user')
@@ -358,11 +628,19 @@ onMounted(() => {
     }
   } catch (e) {}
 
-  // Check prefered dark mode
-  if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  // Check preferred dark mode
+  if (localStorage.getItem('theme') === 'light') {
+    isDark.value = false
+    document.documentElement.classList.remove('dark')
+  } else {
     isDark.value = true
     document.documentElement.classList.add('dark')
   }
+})
+
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval)
+  window.removeEventListener('keydown', handleKeyDown)
 })
 
 const toggleTheme = () => {
@@ -386,86 +664,116 @@ const logout = () => {
 
 <style scoped>
 .sidebar-group-title {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: #64748b;
-  padding: 0 12px;
-  margin-bottom: 8px;
+  padding: 0 10px;
+  margin-bottom: 6px;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 8px 10px;
   border-radius: 14px;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: #94a3b8;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
 .sidebar-link:hover {
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   transform: translateX(2px);
 }
 
+.sidebar-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover .sidebar-icon-box {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.06);
+}
+
 .sidebar-active {
-  background: linear-gradient(90deg, rgba(6, 182, 212, 0.16) 0%, rgba(37, 99, 235, 0.08) 100%) !important;
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.22) 0%, rgba(37, 99, 235, 0.12) 100%) !important;
   color: #38bdf8 !important;
   border: 1px solid rgba(56, 189, 248, 0.35) !important;
-  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.15);
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.18);
+  font-weight: 700 !important;
+}
+
+.sidebar-active .sidebar-icon-box {
+  background: rgba(6, 182, 212, 0.2) !important;
+  color: #38bdf8 !important;
+}
+
+.sidebar-link-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-sub-link {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 7px 10px;
   border-radius: 10px;
   font-size: 12px;
   font-weight: 600;
-  color: #64748b;
+  color: #94a3b8;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .sidebar-sub-link:hover {
-  color: #e2e8f0;
-  background: rgba(30, 41, 59, 0.5);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .sidebar-sub-active {
   color: #38bdf8 !important;
   font-weight: 700 !important;
-  background: rgba(6, 182, 212, 0.1) !important;
+  background: rgba(6, 182, 212, 0.14) !important;
 }
 
-.sidebar-icon {
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.sidebar-link:hover .sidebar-icon {
-  transform: scale(1.1);
-}
-
-/* Custom Scrollbar for Sidebar */
+/* Custom Scrollbar for Sleek Floating Look */
 .scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
+  height: 5px;
 }
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.5);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.8);
+  background: rgba(56, 189, 248, 0.4);
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(0.97); }
+}
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
 }
 </style>
