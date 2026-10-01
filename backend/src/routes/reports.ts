@@ -9,4 +9,6 @@ export const reportRoutes = new Elysia({ prefix: "/api/reports" })
   .get("/by-radiologist", ReportController.getRadiologistHandler)
   .get("/by-referring-doctor", ReportController.getReferringDoctorsHandler)
   .get("/by-status", ReportController.getByStatusHandler)
-  .get("/by-priority", ReportController.getByPriorityHandler);
+  .get("/by-priority", ReportController.getByPriorityHandler)
+  .get("/waiting-time", ReportController.getWaitingTimeHandler);
+

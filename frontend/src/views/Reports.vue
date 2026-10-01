@@ -7,18 +7,25 @@
         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Pantau kinerja operasional dan statistik radiologi secara real-time</p>
       </div>
 
-      <!-- Date Filter -->
-      <div class="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-        <div class="flex items-center px-3 gap-2 border-r border-slate-100 dark:border-slate-800">
-          <svg class="text-slate-400" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <input type="date" v-model="filter.from" class="text-xs font-bold bg-transparent border-none focus:ring-0 text-slate-600 dark:text-slate-300 p-0" />
+      <!-- Date Filter & Quick Link -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <router-link to="/admin/reports/waiting-time" class="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs font-bold hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors border border-amber-200/80 dark:border-amber-800/80 shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Waktu Tunggu Pasien ➔
+        </router-link>
+
+        <div class="flex items-center gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center px-3 gap-2 border-r border-slate-100 dark:border-slate-800">
+            <svg class="text-slate-400" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input type="date" v-model="filter.from" class="text-xs font-bold bg-transparent border-none focus:ring-0 text-slate-600 dark:text-slate-300 p-0" />
+          </div>
+          <div class="flex items-center px-3 gap-2">
+            <input type="date" v-model="filter.to" class="text-xs font-bold bg-transparent border-none focus:ring-0 text-slate-600 dark:text-slate-300 p-0" />
+          </div>
+          <button @click="fetchAllData" :disabled="loading" class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/40 text-cyan-600 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 transition-colors">
+            <svg :class="loading ? 'animate-spin' : ''" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
         </div>
-        <div class="flex items-center px-3 gap-2">
-          <input type="date" v-model="filter.to" class="text-xs font-bold bg-transparent border-none focus:ring-0 text-slate-600 dark:text-slate-300 p-0" />
-        </div>
-        <button @click="fetchAllData" :disabled="loading" class="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-900/40 text-cyan-600 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 transition-colors">
-          <svg :class="loading ? 'animate-spin' : ''" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        </button>
       </div>
     </div>
 

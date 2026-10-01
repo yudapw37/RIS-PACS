@@ -105,7 +105,11 @@
           <div class="space-y-1">
             <router-link to="/admin/reports" active-class="nav-active" class="nav-link group">
               <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-              <span>Laporan</span>
+              <span>Laporan Statistik</span>
+            </router-link>
+            <router-link to="/admin/reports/waiting-time" active-class="nav-active" class="nav-link group">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon text-amber-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>Waktu Tunggu Pasien</span>
             </router-link>
           </div>
         </div>

@@ -77,4 +77,23 @@ export class ReportController {
       return sendResponse(set, 500, "Gagal memuat distribusi prioritas", { error: err.message });
     }
   }
+
+  static async getWaitingTimeHandler({ query, set }: any) {
+    try {
+      const result = await ReportService.getPatientWaitingTimeReport({
+        from: query?.from,
+        to: query?.to,
+        modality: query?.modality,
+        priority: query?.priority,
+        compliance: query?.compliance,
+        search: query?.search,
+        page: query?.page ? Number(query.page) : 1,
+        limit: query?.limit ? Number(query.limit) : 25,
+      });
+      return sendResponse(set, 200, "Laporan waktu tunggu pasien berhasil dimuat", result);
+    } catch (err: any) {
+      return sendResponse(set, 500, "Gagal memuat laporan waktu tunggu pasien", { error: err.message });
+    }
+  }
 }
+
