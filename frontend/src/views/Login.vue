@@ -9,14 +9,12 @@
       <!-- Top Branding -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 via-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/25 border border-cyan-400/30">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" class="text-white">
-              <path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
+          <div class="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-[var(--color-primary)]/25 border border-cyan-400/30">
+            R
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-xl font-black tracking-tight text-white">Smart<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">RIS</span></span>
+              <span class="text-xl font-black tracking-tight text-white">Smart<span class="text-[var(--color-accent)]">RIS</span></span>
               <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
                 v3.5 Enterprise
               </span>
@@ -68,7 +66,7 @@
                 required 
                 autocomplete="username"
                 class="block w-full py-3.5 pl-10 pr-4 rounded-xl text-xs sm:text-sm font-medium bg-slate-900/90 border border-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all shadow-inner"
-                placeholder="cth: superadmin" 
+                placeholder="Masukkan nama pengguna" 
               />
             </div>
           </div>
@@ -116,7 +114,7 @@
           </div>
 
           <!-- Remember Me -->
-          <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center pt-1">
             <label class="flex items-center gap-2 cursor-pointer select-none">
               <input 
                 type="checkbox" 
@@ -125,7 +123,6 @@
               />
               <span class="text-xs font-medium text-slate-300">Ingat sesi login</span>
             </label>
-            <span class="text-[11px] text-slate-500">Auto-lock 8 jam</span>
           </div>
 
           <!-- Submit Button -->
@@ -144,37 +141,6 @@
           </button>
         </form>
 
-        <!-- Demo Quick-Fill Access Pills -->
-        <div class="mt-8 pt-6 border-t border-slate-800/80">
-          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
-            <span>Akses Cepat Pengujian:</span>
-            <span class="text-[10px] text-cyan-400 font-normal">Klik untuk isi otomatis</span>
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            <button 
-              type="button"
-              @click="fillDemo('superadmin', 'password123')"
-              class="px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all text-center"
-            >
-              Superadmin
-            </button>
-            <button 
-              type="button"
-              @click="fillDemo('radiografer1', 'password123')"
-              class="px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all text-center"
-            >
-              Radiografer
-            </button>
-            <button 
-              type="button"
-              @click="fillDemo('dokter1', 'password123')"
-              class="px-2.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-[11px] font-semibold text-slate-300 hover:text-white transition-all text-center"
-            >
-              Dr. Radiologi
-            </button>
-          </div>
-        </div>
-
         <div v-if="showForgotNotice" class="mt-4 p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center justify-between animate-fade-in">
           <span>Hubungi Tim IT Rumah Sakit untuk reset kata sandi akun Anda.</span>
           <button @click="showForgotNotice = false" class="text-cyan-400 font-bold ml-2">Tutup</button>
@@ -189,7 +155,7 @@
           </svg>
           <span>Enkripsi TLS 1.3 Terlindungi</span>
         </div>
-        <span>Permenkes 24/2022 &bull; HL7 FHIR</span>
+        <span>HL7 FHIR &bull; DICOMweb</span>
       </div>
     </div>
 
@@ -218,7 +184,7 @@
           <span class="text-xs font-bold uppercase tracking-widest text-cyan-300">Pusat Kendali Radiologi Terpadu</span>
         </div>
         <h2 class="text-2xl font-black text-white tracking-tight leading-snug">
-          Integrasi PACS, Worklist DICOM, dan Gateway SATUSEHAT Kemenkes RI
+          Integrasi PACS, Worklist DICOM, dan Gateway SATUSEHAT
         </h2>
         <p class="text-xs text-slate-300 mt-2.5 leading-relaxed font-normal">
           Solusi terpadu rumah sakit untuk pemrosesan citra medis beresolusi tinggi, pembacaan ekspertise klinis, serta audit Standar Pelayanan Minimal (SPM) waktu tunggu pasien secara real-time.
@@ -245,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import API_BASE from '../config/api'
@@ -261,12 +227,6 @@ const form = reactive({
   username: '',
   password: ''
 })
-
-const fillDemo = (u: string, p: string) => {
-  form.username = u
-  form.password = p
-  errorMsg.value = ''
-}
 
 const handleLogin = async () => {
   isLoading.value = true
@@ -303,12 +263,6 @@ const handleLogin = async () => {
     isLoading.value = false
   }
 }
-
-onMounted(() => {
-  // Pre-fill superadmin for easy convenience
-  form.username = 'superadmin'
-  form.password = 'password123'
-})
 </script>
 
 <style scoped>
