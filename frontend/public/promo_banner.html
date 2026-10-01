@@ -114,16 +114,26 @@
 
     /* Hero Typography */
     .hero-title {
-      font-size: clamp(28px, 3.5vw, 48px);
+      font-size: clamp(34px, 4.2vw, 56px);
       font-weight: 900;
       text-align: center;
-      line-height: 1.18;
+      line-height: 1.15;
       letter-spacing: -0.5px;
       max-width: 950px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       background: linear-gradient(135deg, #ffffff 40%, #93c5fd 80%, #38bdf8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subline {
+      font-size: clamp(16px, 1.8vw, 24px);
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 12px;
     }
 
     .hero-subtitle {
@@ -423,7 +433,8 @@
     </div>
 
     <!-- Main Headline -->
-    <h1 class="hero-title">Sistem Radiologi Terpadu & Gateway SATUSEHAT</h1>
+    <h1 class="hero-title">Sistem Radiologi Terpadu</h1>
+    <div class="hero-subline">PACS &bull; RIS &bull; SatuSehat</div>
     <p class="hero-subtitle">
       Solusi lengkap rumah sakit untuk pengarsipan citra medis DICOM, pembacaan ekspertise klinis, dan bridging
       interoperabilitas resmi SATUSEHAT Kemenkes RI secara real-time.
@@ -595,13 +606,17 @@
 
         // 2. Top Header Banner
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 44px "Plus Jakarta Sans", sans-serif';
+        ctx.font = 'bold 48px "Plus Jakarta Sans", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('SmartRIS Enterprise - Sistem Radiologi & Gateway SATUSEHAT', W / 2, 75);
+        ctx.fillText('Sistem Radiologi Terpadu', W / 2, 60);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '800 24px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('PACS  •  RIS  •  SatuSehat', W / 2, 98);
 
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '500 20px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText('Integrasi PACS DCM4CHEE, Worklist DICOM, Ekspertise Klinis, dan Bridging Resmi HL7 FHIR R4', W / 2, 115);
+        ctx.font = '500 16px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Integrasi PACS DCM4CHEE, Worklist DICOM, Ekspertise Klinis, dan Bridging Resmi SATUSEHAT HL7 FHIR R4', W / 2, 126);
 
         // 3. Grid Coordinates
         const startX = 70;
