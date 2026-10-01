@@ -221,10 +221,7 @@
               <th class="px-4 py-3.5 text-center">Waktu Diterima</th>
               <th class="px-4 py-3.5 text-center">Mulai ➔ Selesai</th>
               <th class="px-4 py-3.5 text-center">Ekspertise Selesai</th>
-              <th class="px-4 py-3.5 text-center bg-cyan-50/40 dark:bg-cyan-950/20">Antre Masuk</th>
-              <th class="px-4 py-3.5 text-center bg-blue-50/40 dark:bg-blue-950/20">Tindakan</th>
-              <th class="px-4 py-3.5 text-center bg-amber-50/40 dark:bg-amber-950/20">Tunggu Baca</th>
-              <th class="px-4 py-3.5 text-center bg-indigo-50/40 dark:bg-indigo-950/20 font-extrabold text-indigo-600 dark:text-indigo-400">Total TAT</th>
+              <th class="px-4 py-3.5 text-center bg-indigo-50/40 dark:bg-indigo-950/20 font-extrabold text-indigo-600 dark:text-indigo-400">Total Waktu (TAT)</th>
               <th class="px-4 py-3.5 text-center">Status SPM</th>
               <th class="px-5 py-3.5 text-right">Detail</th>
             </tr>
@@ -286,30 +283,6 @@
                   </div>
                 </div>
                 <span v-else class="text-amber-500 text-[10px] font-semibold italic">Belum dibaca</span>
-              </td>
-
-              <!-- Antre Masuk (orderDate -> examStartedAt) -->
-              <td class="px-4 py-3.5 text-center whitespace-nowrap bg-cyan-50/30 dark:bg-cyan-950/10">
-                <span v-if="item.waitTimeExamMinutes !== null" class="font-bold text-cyan-700 dark:text-cyan-300 tabular-nums">
-                  {{ formatMinutes(item.waitTimeExamMinutes) }}
-                </span>
-                <span v-else class="text-slate-300 dark:text-slate-600">-</span>
-              </td>
-
-              <!-- Tindakan (examStartedAt -> examFinishedAt) -->
-              <td class="px-4 py-3.5 text-center whitespace-nowrap bg-blue-50/30 dark:bg-blue-950/10">
-                <span v-if="item.examDurationMinutes !== null" class="font-bold text-blue-700 dark:text-blue-300 tabular-nums">
-                  {{ formatMinutes(item.examDurationMinutes) }}
-                </span>
-                <span v-else class="text-slate-300 dark:text-slate-600">-</span>
-              </td>
-
-              <!-- Tunggu Baca (examFinishedAt -> expertiseCreatedAt) -->
-              <td class="px-4 py-3.5 text-center whitespace-nowrap bg-amber-50/30 dark:bg-amber-950/10">
-                <span v-if="item.waitTimeExpertiseMinutes !== null" class="font-bold text-amber-700 dark:text-amber-300 tabular-nums">
-                  {{ formatMinutes(item.waitTimeExpertiseMinutes) }}
-                </span>
-                <span v-else class="text-slate-300 dark:text-slate-600">-</span>
               </td>
 
               <!-- Total TAT (orderDate -> expertiseCreatedAt) -->
