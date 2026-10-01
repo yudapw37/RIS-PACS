@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartRIS - Poster Iklan & Promosi Produk</title>
+  <title>SmartRIS Enterprise - Materi Promosi & Iklan Sistem</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap"
+    rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -22,8 +25,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
+      padding: 30px 20px 60px;
       overflow-x: hidden;
       position: relative;
     }
@@ -31,12 +33,12 @@
     /* Ambient Background Light */
     .glow-cyan {
       position: absolute;
-      top: -10%;
-      left: 20%;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, transparent 70%);
-      filter: blur(80px);
+      top: -5%;
+      left: 15%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.16) 0%, transparent 70%);
+      filter: blur(100px);
       pointer-events-none;
       z-index: 0;
     }
@@ -44,17 +46,17 @@
     .glow-blue {
       position: absolute;
       bottom: -10%;
-      right: 15%;
-      width: 700px;
-      height: 700px;
-      background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
-      filter: blur(100px);
+      right: 10%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.14) 0%, transparent 70%);
+      filter: blur(120px);
       pointer-events-none;
       z-index: 0;
     }
 
     .ad-container {
-      max-width: 1400px;
+      max-width: 1360px;
       width: 100%;
       position: relative;
       z-index: 10;
@@ -68,12 +70,12 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(56, 189, 248, 0.25);
       padding: 8px 20px;
       border-radius: 9999px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(12px);
     }
 
@@ -87,7 +89,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 14px;
+      font-size: 15px;
       border: 1px solid rgba(56, 189, 248, 0.4);
     }
 
@@ -112,62 +114,102 @@
 
     /* Hero Typography */
     .hero-title {
-      font-size: clamp(32px, 4vw, 54px);
+      font-size: clamp(28px, 3.5vw, 48px);
       font-weight: 900;
       text-align: center;
-      line-height: 1.15;
-      letter-spacing: -1px;
-      max-width: 1000px;
-      margin-bottom: 16px;
+      line-height: 1.18;
+      letter-spacing: -0.5px;
+      max-width: 950px;
+      margin-bottom: 12px;
       background: linear-gradient(135deg, #ffffff 40%, #93c5fd 80%, #38bdf8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .hero-subtitle {
-      font-size: clamp(14px, 1.6vw, 18px);
+      font-size: clamp(13px, 1.4vw, 16px);
       text-align: center;
       color: #94a3b8;
-      max-width: 820px;
+      max-width: 780px;
       line-height: 1.6;
-      margin-bottom: 50px;
+      margin-bottom: 36px;
       font-weight: 500;
     }
 
-    /* Showcase 3D Composition */
-    .showcase-stage {
-      position: relative;
+    /* Bento Grid (Wireframe Layout: 1 Large Left, 2 Stacked Right) */
+    .bento-wrapper {
       width: 100%;
-      height: 640px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      perspective: 1200px;
-      margin-bottom: 40px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(6, 182, 212, 0.08);
+      backdrop-filter: blur(16px);
+      margin-bottom: 32px;
     }
 
-    .screen-card {
-      position: absolute;
+    .bento-grid {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+      width: 100%;
+      height: 580px;
+    }
+
+    /* Single Bento Box */
+    .bento-box {
+      position: relative;
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      background: #0f172a;
+      background: #0b1120;
+      border: 2px solid rgba(51, 65, 85, 0.8);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
     }
 
-    .screen-card img {
+    .bento-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       display: block;
+      transition: transform 0.5s ease;
     }
 
-    .screen-label {
+    .bento-box:hover img {
+      transform: scale(1.02);
+    }
+
+    /* LEFT: The Main Login Hero Box */
+    .bento-main {
+      border: 2px solid rgba(6, 182, 212, 0.7);
+      box-shadow: 0 20px 50px rgba(6, 182, 212, 0.25), 0 0 30px rgba(6, 182, 212, 0.15);
+    }
+
+    .bento-main:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 25px 60px rgba(6, 182, 212, 0.35), 0 0 45px rgba(6, 182, 212, 0.25);
+    }
+
+    /* RIGHT: Stacked 2 Boxes */
+    .bento-stack {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      height: 100%;
+    }
+
+    .bento-sub:hover {
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+
+    /* Badge Overlays */
+    .bento-badge {
       position: absolute;
       bottom: 16px;
       left: 16px;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(56, 189, 248, 0.4);
       padding: 6px 14px;
       border-radius: 12px;
@@ -177,8 +219,17 @@
       backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      pointer-events: none;
+    }
+
+    .main-badge {
+      background: rgba(8, 145, 178, 0.92);
+      border-color: #38bdf8;
+      font-size: 13px;
+      bottom: 20px;
+      left: 20px;
     }
 
     .dot-pulse {
@@ -187,85 +238,38 @@
       border-radius: 50%;
       background: #38bdf8;
       box-shadow: 0 0 10px #38bdf8;
+      animation: pulse 2s infinite;
     }
 
-    /* Left Card: Gateway */
-    .card-gateway {
-      width: 620px;
-      height: 380px;
-      left: 2%;
-      top: 50%;
-      transform: translateY(-50%) rotateY(16deg) scale(0.85);
-      z-index: 10;
-      opacity: 0.85;
-      filter: brightness(0.9);
-    }
+    @keyframes pulse {
 
-    .card-gateway:hover {
-      transform: translateY(-50%) rotateY(8deg) scale(0.92);
-      opacity: 1;
-      filter: brightness(1);
-      z-index: 30;
-    }
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
 
-    /* Right Card: SATUSEHAT Official */
-    .card-satusehat {
-      width: 620px;
-      height: 380px;
-      right: 2%;
-      top: 50%;
-      transform: translateY(-50%) rotateY(-16deg) scale(0.85);
-      z-index: 10;
-      opacity: 0.85;
-      filter: brightness(0.9);
-    }
-
-    .card-satusehat:hover {
-      transform: translateY(-50%) rotateY(-8deg) scale(0.92);
-      opacity: 1;
-      filter: brightness(1);
-      z-index: 30;
-    }
-
-    /* MAIN CENTER CARD: Login View (The Hero) */
-    .card-login {
-      width: 780px;
-      height: 480px;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      z-index: 25;
-      border: 2px solid rgba(56, 189, 248, 0.5);
-      box-shadow: 0 35px 80px -15px rgba(6, 182, 212, 0.35), 0 0 40px rgba(6, 182, 212, 0.2);
-    }
-
-    .card-login:hover {
-      transform: translate(-50%, -50%) scale(1.03);
-      border-color: #38bdf8;
-      z-index: 40;
-    }
-
-    .card-login .screen-label {
-      background: rgba(8, 145, 178, 0.9);
-      border-color: #38bdf8;
-      font-size: 13px;
+      50% {
+        opacity: 0.6;
+        transform: scale(1.2);
+      }
     }
 
     /* Bottom Feature Highlights */
     .feature-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 16px;
       width: 100%;
       max-width: 1200px;
-      margin-top: 10px;
+      margin-bottom: 30px;
     }
 
     .feature-box {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.7);
       border: 1px solid rgba(51, 65, 85, 0.6);
-      padding: 18px 22px;
-      border-radius: 20px;
+      padding: 16px 20px;
+      border-radius: 18px;
       backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
@@ -274,15 +278,15 @@
     }
 
     .feature-box:hover {
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.95);
       border-color: rgba(56, 189, 248, 0.5);
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
 
     .feature-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
       background: rgba(56, 189, 248, 0.1);
       border: 1px solid rgba(56, 189, 248, 0.2);
       display: flex;
@@ -293,7 +297,7 @@
     }
 
     .feature-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       color: #f1f5f9;
       margin-bottom: 2px;
@@ -305,13 +309,13 @@
       line-height: 1.4;
     }
 
-    /* Toggle/Export Actions */
+    /* Export / Action Bar */
     .action-bar {
-      margin-top: 40px;
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
     }
 
     .btn-action {
@@ -320,7 +324,7 @@
       text-decoration: none;
       font-weight: 800;
       font-size: 13px;
-      padding: 12px 24px;
+      padding: 13px 26px;
       border-radius: 14px;
       border: 1px solid rgba(56, 189, 248, 0.4);
       box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
@@ -338,42 +342,71 @@
     }
 
     .btn-secondary {
-      background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(71, 85, 105, 0.5);
+      background: rgba(30, 41, 59, 0.85);
+      border-color: rgba(71, 85, 105, 0.6);
       color: #cbd5e1;
     }
 
     .btn-secondary:hover {
-      background: rgba(51, 65, 85, 0.8);
+      background: rgba(51, 65, 85, 0.9);
       color: white;
     }
 
-    /* Modal for Cinematic Render */
-    #posterModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 100;
-      padding: 40px 20px;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-
-    #posterModal.active {
+    /* Single Merged Image Preview Section */
+    .merged-preview-section {
+      width: 100%;
+      max-width: 1360px;
+      margin-top: 50px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(51, 65, 85, 0.6);
       display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    #posterModal img {
-      max-width: 90vw;
-      max-height: 80vh;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .merged-preview-section h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+    }
+
+    .merged-preview-section p {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+
+    #renderedCanvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 20px;
+      border: 2px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    @media (max-width: 900px) {
+      .bento-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .bento-main {
+        height: 380px;
+      }
+
+      .bento-stack {
+        grid-template-rows: auto;
+        gap: 16px;
+      }
+
+      .bento-sub {
+        height: 240px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="glow-cyan"></div>
   <div class="glow-blue"></div>
@@ -384,46 +417,54 @@
       <div class="logo-badge">R</div>
       <span class="badge-text">Smart<span style="color:#38bdf8;">RIS</span> Enterprise</span>
       <span class="badge-pill">HL7 FHIR R4 Ready</span>
-      <span class="badge-pill" style="background:rgba(56,189,248,0.15); color:#38bdf8; border-color:rgba(56,189,248,0.3);">PACS &bull; DICOM</span>
+      <span class="badge-pill"
+        style="background:rgba(56,189,248,0.15); color:#38bdf8; border-color:rgba(56,189,248,0.3);">PACS DCM4CHEE &bull;
+        DICOM MWL</span>
     </div>
 
     <!-- Main Headline -->
     <h1 class="hero-title">Sistem Radiologi Terpadu & Gateway SATUSEHAT</h1>
     <p class="hero-subtitle">
-      Koneksikan Worklist Modalitas, Server PACS DCM4CHEE, Ekspertise Klinis, dan Pengiriman Otomatis ke SATUSEHAT Kemenkes RI dalam satu sistem andal tanpa hambatan.
+      Solusi lengkap rumah sakit untuk pengarsipan citra medis DICOM, pembacaan ekspertise klinis, dan bridging
+      interoperabilitas resmi SATUSEHAT Kemenkes RI secara real-time.
     </p>
 
-    <!-- 3D Showcase Stage -->
-    <div class="showcase-stage">
-      <!-- Left: SmartRIS Gateway Log -->
-      <div class="screen-card card-gateway">
-        <img src="/promo/gateway.jpg" alt="SmartRIS SATUSEHAT Gateway Monitoring">
-        <div class="screen-label">
-          <span class="dot-pulse"></span>
-          <span>Gateway Hub & Outbox Monitoring</span>
+    <!-- BENTO GRID (1 Large Left, 2 Stacked Right) -->
+    <div class="bento-wrapper">
+      <div class="bento-grid">
+        <!-- 1. LEFT LARGE: The Login View (UTAMA) -->
+        <div class="bento-box bento-main">
+          <img src="./promo/login.jpg" alt="SmartRIS Login Portal & Control Center">
+          <div class="bento-badge main-badge">
+            <span class="dot-pulse" style="background:#ffffff; box-shadow:0 0 10px #ffffff;"></span>
+            <span>⭐ Portal Akses SmartRIS Enterprise </span>
+          </div>
         </div>
-      </div>
 
-      <!-- Right: SATUSEHAT Official Portal -->
-      <div class="screen-card card-satusehat">
-        <img src="/promo/satusehat.jpg" alt="Official SATUSEHAT Kemenkes Verified Portal">
-        <div class="screen-label">
-          <span class="dot-pulse" style="background:#10b981; box-shadow:0 0 10px #10b981;"></span>
-          <span>Terverifikasi Kemenkes (201 Created)</span>
-        </div>
-      </div>
+        <!-- 2. RIGHT STACK: 2 Boxes -->
+        <div class="bento-stack">
+          <!-- Top Right: SmartRIS Gateway Hub -->
+          <div class="bento-box bento-sub">
+            <img src="./promo/gateway.jpg" alt="SmartRIS SATUSEHAT Gateway Hub">
+            <div class="bento-badge">
+              <span class="dot-pulse"></span>
+              <span>Gateway Hub & Outbox Monitoring</span>
+            </div>
+          </div>
 
-      <!-- Center (Hero): The Login View -->
-      <div class="screen-card card-login">
-        <img src="/promo/login.jpg" alt="SmartRIS Enterprise Login & Control Center">
-        <div class="screen-label">
-          <span class="dot-pulse" style="background:#ffffff; box-shadow:0 0 10px #ffffff;"></span>
-          <span>Portal Akses SmartRIS Enterprise</span>
+          <!-- Bottom Right: Official SATUSEHAT Portal -->
+          <div class="bento-box bento-sub">
+            <img src="./promo/satusehat.jpg" alt="Portal Resmi SATUSEHAT Kemenkes">
+            <div class="bento-badge">
+              <span class="dot-pulse" style="background:#10b981; box-shadow:0 0 10px #10b981;"></span>
+              <span>Terverifikasi (201 Created)</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 4 Feature Value Pillars -->
+    <!-- 4 Value Proposition Cards -->
     <div class="feature-grid">
       <div class="feature-box">
         <div class="feature-icon">⚡</div>
@@ -460,28 +501,226 @@
 
     <!-- Action Buttons -->
     <div class="action-bar">
-      <button onclick="openModal()" class="btn-action">
-        <span>🖼️ Lihat Poster Iklan Sinematik</span>
+      <button onclick="downloadMergedImage()" class="btn-action">
+        <span>💾 Download Gambar Iklan Hasil Gabungan (1920x1080)</span>
       </button>
-      <a href="/promo/smartris_ad_cinematic.jpg" download="SmartRIS_Promo_Ad.jpg" class="btn-action btn-secondary">
-        <span>⬇️ Download Poster Siap Iklan</span>
+      <a href="./promo/smartris_ad_cinematic.jpg" download="SmartRIS_Promo_Ad.jpg" class="btn-action btn-secondary">
+        <span>🖼️ Download Versi Sinematik AI 3D</span>
       </a>
+    </div>
+
+    <!-- Hidden Canvas for Auto High-Res Compositing -->
+    <canvas id="compCanvas" width="1920" height="1080" style="display:none;"></canvas>
+
+    <!-- Merged High-Res Output Preview -->
+    <div class="merged-preview-section">
+      <h2>Hasil Gambar Iklan Gabungan (1 File Utuh)</h2>
+      <p>Gambar di bawah ini merupakan gabungan 3 layar sesuai susunan wireframe (1 kiri besar, 2 kanan bertumpuk). Klik
+        kanan dan pilih <strong>"Simpan gambar sebagai..."</strong> atau klik tombol download di atas.</p>
+      <img id="renderedImage" alt="Hasil Iklan Gabungan SmartRIS"
+        style="max-width:100%; border-radius:18px; border:2px solid rgba(56,189,248,0.4); box-shadow:0 25px 60px rgba(0,0,0,0.85);" />
     </div>
   </div>
 
-  <!-- Fullscreen Modal Poster -->
-  <div id="posterModal" onclick="closeModal()">
-    <img src="/promo/smartris_ad_cinematic.jpg" alt="SmartRIS Cinematic Promo Poster" onclick="event.stopPropagation()">
-    <button onclick="closeModal()" class="btn-action btn-secondary" style="margin-top:20px;">Tutup Tampilan</button>
-  </div>
-
   <script>
-    function openModal() {
-      document.getElementById('posterModal').classList.add('active');
-    }
-    function closeModal() {
-      document.getElementById('posterModal').classList.remove('active');
+    // Automated High-Res Canvas Compositor
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('compCanvas');
+      const ctx = canvas.getContext('2d');
+      const previewImg = document.getElementById('renderedImage');
+
+      const imgLogin = new Image();
+      const imgGateway = new Image();
+      const imgSatusehat = new Image();
+
+      let loadedCount = 0;
+      const onImageLoad = () => {
+        loadedCount++;
+        if (loadedCount === 3) {
+          drawComposite();
+        }
+      };
+
+      imgLogin.crossOrigin = "anonymous";
+      imgGateway.crossOrigin = "anonymous";
+      imgSatusehat.crossOrigin = "anonymous";
+
+      imgLogin.onload = onImageLoad;
+      imgGateway.onload = onImageLoad;
+      imgSatusehat.onload = onImageLoad;
+
+      // Use local relative paths
+      imgLogin.src = './promo/login.jpg';
+      imgGateway.src = './promo/gateway.jpg';
+      imgSatusehat.src = './promo/satusehat.jpg';
+
+      function roundRect(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+      }
+
+      function drawComposite() {
+        const W = 1920;
+        const H = 1080;
+
+        // 1. Background
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#030712');
+        bgGrad.addColorStop(0.5, '#071326');
+        bgGrad.addColorStop(1, '#030712');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Ambient Glows
+        const cyanGlow = ctx.createRadialGradient(400, 300, 50, 400, 300, 600);
+        cyanGlow.addColorStop(0, 'rgba(6, 182, 212, 0.22)');
+        cyanGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = cyanGlow;
+        ctx.fillRect(0, 0, W, H);
+
+        const blueGlow = ctx.createRadialGradient(1600, 800, 50, 1600, 800, 700);
+        blueGlow.addColorStop(0, 'rgba(37, 99, 235, 0.18)');
+        blueGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = blueGlow;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. Top Header Banner
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 44px "Plus Jakarta Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('SmartRIS Enterprise - Sistem Radiologi & Gateway SATUSEHAT', W / 2, 75);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '500 20px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('Integrasi PACS DCM4CHEE, Worklist DICOM, Ekspertise Klinis, dan Bridging Resmi HL7 FHIR R4', W / 2, 115);
+
+        // 3. Grid Coordinates
+        const startX = 70;
+        const startY = 150;
+        const totalW = W - 140; // 1780
+        const totalH = H - startY - 100; // 830
+        const gap = 24;
+
+        const leftW = Math.round(totalW * 0.605); // ~1076px
+        const rightW = totalW - leftW - gap;      // ~680px
+        const subH = Math.round((totalH - gap) / 2); // ~403px
+
+        // --- DRAW LEFT LARGE: LOGIN SCREEN ---
+        ctx.save();
+        roundRect(ctx, startX, startY, leftW, totalH, 20);
+        ctx.clip();
+        ctx.drawImage(imgLogin, startX, startY, leftW, totalH);
+        ctx.restore();
+
+        // Border & Glow for Main Login
+        ctx.save();
+        roundRect(ctx, startX, startY, leftW, totalH, 20);
+        ctx.strokeStyle = '#06b6d4';
+        ctx.lineWidth = 4;
+        ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
+        ctx.shadowBlur = 25;
+        ctx.stroke();
+        ctx.restore();
+
+        // Main Badge
+        ctx.save();
+        roundRect(ctx, startX + 24, startY + totalH - 56, 380, 36, 10);
+        ctx.fillStyle = 'rgba(8, 145, 178, 0.95)';
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('⭐ Portal Akses SmartRIS Enterprise (Utama)', startX + 40, startY + totalH - 32);
+        ctx.restore();
+
+        // --- DRAW TOP RIGHT: GATEWAY SCREEN ---
+        const rightX = startX + leftW + gap;
+        const topY = startY;
+
+        ctx.save();
+        roundRect(ctx, rightX, topY, rightW, subH, 18);
+        ctx.clip();
+        ctx.drawImage(imgGateway, rightX, topY, rightW, subH);
+        ctx.restore();
+
+        ctx.save();
+        roundRect(ctx, rightX, topY, rightW, subH, 18);
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.restore();
+
+        // Top Right Badge
+        ctx.save();
+        roundRect(ctx, rightX + 16, topY + subH - 46, 300, 32, 8);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.fill();
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('📡 Gateway Hub & Outbox Monitoring', rightX + 30, topY + subH - 25);
+        ctx.restore();
+
+        // --- DRAW BOTTOM RIGHT: SATUSEHAT PORTAL ---
+        const bottomY = topY + subH + gap;
+
+        ctx.save();
+        roundRect(ctx, rightX, bottomY, rightW, subH, 18);
+        ctx.clip();
+        ctx.drawImage(imgSatusehat, rightX, bottomY, rightW, subH);
+        ctx.restore();
+
+        ctx.save();
+        roundRect(ctx, rightX, bottomY, rightW, subH, 18);
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.restore();
+
+        // Bottom Right Badge
+        ctx.save();
+        roundRect(ctx, rightX + 16, bottomY + subH - 46, 320, 32, 8);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.fill();
+        ctx.fillStyle = '#34d399';
+        ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('✅ Terverifikasi Kemenkes (201 Created)', rightX + 30, bottomY + subH - 25);
+        ctx.restore();
+
+        // --- 4. BOTTOM FOOTER PILLS ---
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ DCM4CHEE PACS &bull; 🩺 HL7 FHIR R4 &bull; 📋 DICOM Modality Worklist &bull; ⏱️ Audit Waktu Pelayanan &bull; 🔒 TLS 1.3 Security', W / 2, H - 35);
+
+        // Convert to live image
+        previewImg.src = canvas.toDataURL('image/jpeg', 0.95);
+      }
+    });
+
+    function downloadMergedImage() {
+      const canvas = document.getElementById('compCanvas');
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      const link = document.createElement('a');
+      link.download = 'SmartRIS_Iklan_Bento_1920x1080.jpg';
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
 </body>
+
 </html>
