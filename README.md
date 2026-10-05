@@ -94,8 +94,8 @@ SmartRIS_V3/
 │   └── 01-schema.sql
 ├── docker-compose.yml        # Development (MySQL only)
 ├── docker-compose.prod.yml   # Production (full 7-service stack)
-├── deploy.sh                 # One-command deploy script
-├── .env.production.example   # Template environment variables
+├── .env.example              # Template konfigurasi terpadu (.env)
+├── .env                      # File konfigurasi aktif tunggal (ignored by git)
 └── dokumentasi.md            # Dokumentasi arsitektur (Bahasa Indonesia)
 ```
 
@@ -254,25 +254,25 @@ docker compose version
 git clone https://github.com/yudapw37/RIS-PACS.git /opt/SmartRIS_V3
 cd /opt/SmartRIS_V3
 
-# Copy & edit environment file
-cp .env.production.example .env.production
-nano .env.production
+# Copy & edit master environment file
+cp .env.example .env
+nano .env
 ```
 
-**⚠️ Yang WAJIB diubah di `.env.production`:**
+**⚠️ Yang perlu disesuaikan di `.env`:**
 
 ```env
-# Sesuaikan IP server Proxmox
-VITE_API_BASE_URL=http://192.168.102.70:3000
+# Cukup ubah IP server ke IP server RS / Proxmox Anda!
+SERVER_IP=192.168.1.50
 
-# Ganti password default untuk production!
+# Ganti password default untuk production (opsional / disarankan):
 MYSQL_ROOT_PASSWORD=<password-kuat-anda>
 MYSQL_PASSWORD=<password-kuat-anda>
 JWT_SECRET=<random-string-panjang>
 DCM4CHEE_DB_PASSWORD=<password-kuat-anda>
 ```
 
-> 💡 Untuk staging, password default di `.env.production.example` bisa langsung dipakai.
+> 💡 Semua port dan URL (Frontend, Backend, PACS, OHIF Viewer) otomatis tersinkronisasi mengikuti nilai `SERVER_IP`.
 
 ---
 
