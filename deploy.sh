@@ -6,8 +6,8 @@
 # PERTAMA KALI:
 #   git clone https://github.com/yudapw37/RIS-PACS.git /opt/SmartRIS_V3
 #   cd /opt/SmartRIS_V3
-#   cp .env.production.example .env.production
-#   nano .env.production   # <-- Sesuaikan IP, Password, dll
+#   cp .env.example .env
+#   nano .env              # <-- Cukup ubah SERVER_IP ke IP server RS
 #   chmod +x deploy.sh
 #   ./deploy.sh
 #
@@ -24,31 +24,39 @@ echo "   $(date)"
 echo "🏥 ================================================="
 echo ""
 
-# 1. Cek file .env.production
-if [ ! -f ".env.production" ]; then
-    echo "❌ File .env.production tidak ditemukan!"
-    echo ""
-    echo "   Langkah pertama kali deploy:"
-    echo "   cp .env.production.example .env.production"
-    echo "   nano .env.production"
-    echo ""
-    echo "   Lalu jalankan ulang: ./deploy.sh"
-    exit 1
+# 1. Cek file konfigurasi tunggal (.env)
+ENV_FILE=".env"
+if [ ! -f "$ENV_FILE" ]; then
+    if [ -f ".env.production" ]; then
+        ENV_FILE=".env.production"
+    else
+        echo "❌ File .env tidak ditemukan!"
+        echo ""
+        echo "   Langkah pertama kali deploy:"
+        echo "   cp .env.example .env"
+        echo "   nano .env   # <-- Cukup ubah SERVER_IP ke IP server RS"
+        echo ""
+        echo "   Lalu jalankan ulang: ./deploy.sh"
+        exit 1
+    fi
 fi
+
+echo "📄 Menggunakan konfigurasi: $ENV_FILE"
+echo ""
 
 # 2. Pull update terbaru dari Git
 echo "📥 Step 1: Pulling latest code from Git..."
-git pull origin main
+git pull origin staging || git pull origin main || true
 echo ""
 
 # 3. Build semua Docker images
 echo "📦 Step 2: Building all Docker images..."
-docker compose -f docker-compose.prod.yml --env-file .env.production build --no-cache
+docker compose -f docker-compose.prod.yml --env-file "$ENV_FILE" build --no-cache
 echo ""
 
 # 4. Restart semua services
 echo "🚀 Step 3: Starting all services..."
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+docker compose -f docker-compose.prod.yml --env-file "$ENV_FILE" up -d
 echo ""
 
 # 5. Tunggu services siap (DCM4CHEE butuh waktu lebih lama untuk boot Wildfly)
@@ -57,11 +65,16 @@ sleep 30
 
 # 6. Status
 echo "📊 Step 5: Checking service status..."
-docker compose -f docker-compose.prod.yml --env-file .env.production ps
+docker compose -f docker-compose.prod.yml --env-file "$ENV_FILE" ps
 echo ""
 
 # 7. Info
-SERVER_IP=$(hostname -I | awk '{print $1}')
+CONFIG_IP=$(grep -E '^SERVER_IP=' "$ENV_FILE" 2>/dev/null | cut -d '=' -f2 | tr -d ' "' || true)
+SERVER_IP=${CONFIG_IP:-$(hostname -I 2>/dev/null | awk '{print $1}' || echo "localhost")}
+if [ "$SERVER_IP" = "localhost" ] || [ -z "$SERVER_IP" ]; then
+    DETECTED_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+    if [ -n "$DETECTED_IP" ]; then SERVER_IP=$DETECTED_IP; fi
+fi
 echo "✅ ================================================="
 echo "   SmartRIS V3 berhasil di-deploy!"
 echo "   "
