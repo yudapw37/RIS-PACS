@@ -12,8 +12,8 @@ RUN npm install
 
 COPY . .
 
-# Argumen build-time agar API URL bisa di-inject saat docker build
-ARG VITE_API_BASE_URL=http://localhost:3000
+# Argumen build-time agar API URL bisa di-inject saat docker build (kosong = adaptive reverse proxy)
+ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 RUN npm run build

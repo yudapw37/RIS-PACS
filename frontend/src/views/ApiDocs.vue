@@ -839,7 +839,7 @@ const endpoints = [
         studyInstanceUid: '1.2.840.10008.5.1.4.1.1.20260929.45',
         numberOfSeries: 1,
         numberOfInstances: 2,
-        viewerUrl: 'http://localhost:3001/viewer?StudyInstanceUIDs=1.2.840.10008.5.1.4.1.1.20260929.45'
+        viewerUrl: 'http://<SERVER_IP>:3001/viewer?StudyInstanceUIDs=1.2.840.10008.5.1.4.1.1.20260929.45'
       }
     },
     parameters: [
@@ -899,7 +899,7 @@ const endpoints = [
     requestPayload: null,
     responsePayload: {
       type: 'HTML Web Application (OHIF Medical Viewer v3)',
-      viewerUrlExample: 'http://192.168.1.100:3001/viewer?StudyInstanceUIDs=1.2.840.10008.5.1.4.1.1.20260928.1'
+      viewerUrlExample: 'http://<SERVER_IP>:3001/viewer?StudyInstanceUIDs=1.2.840.10008.5.1.4.1.1.20260928.1'
     },
     parameters: [
       { name: 'StudyInstanceUIDs', type: 'query param (string)', required: true, description: 'UID unik dari study DICOM yang ingin ditampilkan di viewer' }
