@@ -14,6 +14,35 @@
 
 ---
 
+## 📸 Tampilan Antarmuka (Preview)
+
+<div align="center">
+
+### 1. Portal Autentikasi & Login Modern
+<img src="docs/screenshots/01_login.png" alt="SmartRIS Login Portal" width="100%" />
+
+<br/><br/>
+
+### 2. Worklist & Antrean Pemeriksaan Radiologi
+<img src="docs/screenshots/02_worklist_radiologi.png" alt="Radiology Worklist" width="100%" />
+
+<br/><br/>
+
+### 3. Workspace Terpadu: OHIF DICOM Viewer & Lembar Ekspertise Dokter
+<img src="docs/screenshots/03_order_detail_expertise.png" alt="Integrated OHIF Viewer and Expertise" width="100%" />
+
+</div>
+
+<details>
+<summary><b>🌐 Bonus: Dashboard Gateway SATUSEHAT Kemenkes RI (FHIR R4)</b></summary>
+<br/>
+<p align="center">
+  <img src="docs/screenshots/04_satusehat_gateway.png" alt="SATUSEHAT Gateway" width="100%" />
+</p>
+</details>
+
+---
+
 ## 📐 Arsitektur
 
 ```
