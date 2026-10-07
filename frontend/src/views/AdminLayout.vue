@@ -1,11 +1,14 @@
 <template>
-  <!-- Main Viewport with Ambient Cosmic Medical Background -->
-  <div class="h-screen w-full bg-[#030712] text-slate-100 flex p-3 lg:p-4 gap-3.5 lg:gap-4 overflow-hidden relative font-sans select-none antialiased">
+  <!-- Main Viewport with Ambient Slate Clinical / Cosmic Medical Background -->
+  <div :class="[
+    'h-screen w-full flex p-3 lg:p-4 gap-3.5 lg:gap-4 overflow-hidden relative font-sans select-none antialiased transition-colors duration-300',
+    isDark ? 'bg-[#030712] text-slate-100' : 'bg-slate-200/60 text-slate-800'
+  ]">
     
     <!-- Ambient Radial Glow Lights behind Floating Glass Cards -->
-    <div class="absolute -top-32 -left-20 w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/15 via-sky-500/10 to-transparent rounded-full blur-[140px] pointer-events-none z-0"></div>
-    <div class="absolute -bottom-32 right-10 w-[700px] h-[700px] bg-gradient-to-tr from-blue-600/15 via-indigo-600/10 to-transparent rounded-full blur-[160px] pointer-events-none z-0"></div>
-    <div class="absolute top-1/2 left-1/3 w-[450px] h-[450px] bg-teal-500/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+    <div :class="['absolute -top-32 -left-20 w-[600px] h-[600px] rounded-full blur-[140px] pointer-events-none z-0 transition-opacity duration-500', isDark ? 'bg-gradient-to-br from-cyan-500/15 via-sky-500/10 to-transparent' : 'bg-gradient-to-br from-cyan-500/10 via-sky-500/5 to-transparent opacity-60']"></div>
+    <div :class="['absolute -bottom-32 right-10 w-[700px] h-[700px] rounded-full blur-[160px] pointer-events-none z-0 transition-opacity duration-500', isDark ? 'bg-gradient-to-tr from-blue-600/15 via-indigo-600/10 to-transparent' : 'bg-gradient-to-tr from-blue-600/8 via-indigo-600/5 to-transparent opacity-60']"></div>
+    <div :class="['absolute top-1/2 left-1/3 w-[450px] h-[450px] rounded-full blur-[120px] pointer-events-none z-0 transition-opacity duration-500', isDark ? 'bg-teal-500/5' : 'bg-teal-500/5 opacity-40']"></div>
 
     <!-- Mobile Drawer Overlay Backdrop -->
     <div 
@@ -19,7 +22,10 @@
     <!-- ══════════════════════════════════════════════════════════════════ -->
     <aside 
       :class="[
-        'h-full rounded-3xl bg-slate-900/80 dark:bg-[#070e1d]/85 backdrop-blur-2xl border border-white/10 dark:border-cyan-500/20 shadow-2xl flex flex-col transition-all duration-300 z-50 shrink-0 relative overflow-hidden',
+        'h-full rounded-3xl backdrop-blur-2xl flex flex-col transition-all duration-300 z-50 shrink-0 relative overflow-hidden',
+        isDark 
+          ? 'bg-[#070e1d]/85 border border-cyan-500/20 text-slate-100 shadow-2xl' 
+          : 'bg-white/85 border border-slate-200/90 text-slate-800 shadow-xl shadow-slate-300/40',
         // Desktop width states
         isCollapsed ? 'lg:w-[84px]' : 'lg:w-72',
         // Mobile fixed drawer states
@@ -29,7 +35,7 @@
       ]"
     >
       <!-- Top Branding Area -->
-      <div class="h-20 flex items-center justify-between px-5 border-b border-white/[0.08] shrink-0 bg-white/[0.02]">
+      <div :class="['h-20 flex items-center justify-between px-5 shrink-0 transition-colors', isDark ? 'border-b border-white/[0.08] bg-white/[0.02]' : 'border-b border-slate-200/80 bg-slate-50/60']">
         <div class="flex items-center gap-3 min-w-0">
           <!-- Radiology Aperture Logo Icon -->
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 via-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30 border border-cyan-300/40 shrink-0 group cursor-pointer relative overflow-hidden">
@@ -46,17 +52,17 @@
           <!-- Brand Text (Hidden when collapsed on desktop) -->
           <div v-show="!isCollapsed || isMobileSidebarOpen" class="min-w-0 transition-opacity duration-200">
             <div class="flex items-center gap-1.5">
-              <span class="font-black text-lg tracking-tight text-white">Smart<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">RIS</span></span>
-              <span class="px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-sm">v3.5</span>
+              <span :class="['font-black text-lg tracking-tight', isDark ? 'text-white' : 'text-slate-800']">Smart<span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-sky-400 to-blue-500">RIS</span></span>
+              <span class="px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 shadow-sm">v3.5</span>
             </div>
-            <p class="text-[10px] font-semibold text-slate-400 tracking-wide truncate">PACS & Radiology Network</p>
+            <p :class="['text-[10px] font-semibold tracking-wide truncate', isDark ? 'text-slate-400' : 'text-slate-500']">PACS & Radiology Network</p>
           </div>
         </div>
 
         <!-- Mobile Close Button -->
         <button 
           @click="isMobileSidebarOpen = false" 
-          class="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          :class="['lg:hidden p-2 rounded-xl transition-colors', isDark ? 'text-slate-400 hover:text-white hover:bg-white/10' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100']"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -322,18 +328,18 @@
 
       <!-- Bottom User Profile Card (No top border line, no logout button) -->
       <div class="p-3 shrink-0">
-        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/30 transition-all">
+        <div :class="['flex items-center gap-3 p-2.5 rounded-2xl transition-all', isDark ? 'bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/30' : 'bg-slate-100/90 border border-slate-200/90 hover:border-cyan-500/40 shadow-sm']">
           <div class="relative shrink-0">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-cyan-500 to-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-cyan-500/20 border border-cyan-400/30">
               {{ userInitials }}
             </div>
-            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-slate-900 animate-pulse" title="Status: Online"></span>
+            <span :class="['absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 animate-pulse', isDark ? 'border-slate-900' : 'border-white']" title="Status: Online"></span>
           </div>
 
           <div v-show="!isCollapsed || isMobileSidebarOpen" class="flex-1 min-w-0 transition-opacity duration-200">
-            <p class="text-xs font-bold text-white truncate">{{ userName }}</p>
+            <p :class="['text-xs font-bold truncate', isDark ? 'text-white' : 'text-slate-800']">{{ userName }}</p>
             <div class="flex items-center gap-1.5 mt-0.5">
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 truncate">
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wider bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 truncate">
                 {{ userRole }}
               </span>
             </div>
@@ -348,7 +354,12 @@
     <main class="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative z-10">
 
       <!-- FLOATING HEADER CAPSULE -->
-      <header class="h-16 lg:h-18 rounded-2xl bg-slate-900/80 dark:bg-[#070e1d]/85 backdrop-blur-2xl border border-white/10 dark:border-cyan-500/20 shadow-xl px-5 lg:px-6 flex items-center justify-between shrink-0 mb-3.5 relative z-20">
+      <header :class="[
+        'h-16 lg:h-18 rounded-2xl backdrop-blur-2xl px-5 lg:px-6 flex items-center justify-between shrink-0 mb-3.5 relative z-20 transition-all duration-300',
+        isDark 
+          ? 'bg-[#070e1d]/85 border border-cyan-500/20 text-white shadow-xl' 
+          : 'bg-white/85 border border-slate-200/90 text-slate-800 shadow-lg shadow-slate-300/30'
+      ]">
         
         <!-- Left: Mobile Toggle, Desktop Collapse, Dynamic Breadcrumb -->
         <div class="flex items-center gap-3.5 min-w-0">
@@ -356,7 +367,7 @@
           <!-- Mobile Menu Trigger Button -->
           <button 
             @click="isMobileSidebarOpen = true" 
-            class="lg:hidden p-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white transition-colors"
+            :class="['lg:hidden p-2 rounded-xl transition-colors', isDark ? 'bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900']"
             title="Buka Menu"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -365,7 +376,7 @@
           <!-- Desktop Sidebar Collapse Toggle -->
           <button 
             @click="isCollapsed = !isCollapsed" 
-            class="hidden lg:flex p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-300 border border-white/5 transition-all"
+            :class="['hidden lg:flex p-2 rounded-xl transition-all', isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-300 border border-white/5' : 'bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-cyan-700 border border-slate-200']"
             :title="isCollapsed ? 'Perlebar Sidebar' : 'Persempit Sidebar'"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" :class="['transition-transform duration-200', isCollapsed ? 'rotate-180 text-cyan-400' : '']">
@@ -375,12 +386,12 @@
 
           <!-- Dynamic Title & Category Breadcrumb -->
           <div class="min-w-0">
-            <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">
               <span>SmartRIS</span>
-              <span class="text-slate-600">&bull;</span>
-              <span class="text-cyan-400">{{ pageMeta.category }}</span>
+              <span :class="isDark ? 'text-slate-600' : 'text-slate-400'">&bull;</span>
+              <span class="text-cyan-600 dark:text-cyan-400 font-extrabold">{{ pageMeta.category }}</span>
             </div>
-            <h1 class="text-base lg:text-lg font-black text-white tracking-tight leading-tight truncate">
+            <h1 :class="['text-base lg:text-lg font-black tracking-tight leading-tight truncate', isDark ? 'text-white' : 'text-slate-900']">
               {{ pageMeta.title }}
             </h1>
           </div>
@@ -390,7 +401,7 @@
         <div class="hidden md:flex items-center gap-4">
           <!-- Quick Search Bar -->
           <div class="relative w-64 lg:w-80 group">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cyan-400 transition-colors">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cyan-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
             <input 
@@ -398,16 +409,21 @@
               @keydown.enter="handleQuickSearch"
               type="text" 
               placeholder="Cari pasien, no. RM, order..." 
-              class="w-full bg-white/[0.06] hover:bg-white/[0.09] focus:bg-slate-900 border border-white/10 focus:border-cyan-500/50 rounded-xl pl-9 pr-14 py-1.5 text-xs text-white placeholder-slate-400 outline-none transition-all shadow-inner"
+              :class="[
+                'w-full rounded-xl pl-9 pr-14 py-1.5 text-xs outline-none transition-all shadow-inner',
+                isDark 
+                  ? 'bg-white/[0.06] hover:bg-white/[0.09] focus:bg-slate-900 border border-white/10 focus:border-cyan-500/50 text-white placeholder-slate-400' 
+                  : 'bg-slate-100/90 hover:bg-slate-200/60 focus:bg-white border border-slate-200 focus:border-cyan-500/60 text-slate-800 placeholder-slate-400'
+              ]"
             />
             <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
-              <span class="px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white/10 text-slate-300 rounded border border-white/10">⌘K</span>
+              <span :class="['px-1.5 py-0.5 text-[10px] font-mono font-bold rounded border', isDark ? 'bg-white/10 text-slate-300 border-white/10' : 'bg-slate-200/90 text-slate-600 border-slate-300/80']">⌘K</span>
             </div>
           </div>
 
           <!-- Real-Time WIB Digital Clock -->
-          <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-bold text-slate-300 font-mono shadow-sm">
-            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+          <div :class="['hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-bold font-mono shadow-sm', isDark ? 'bg-white/[0.04] border border-white/[0.08] text-slate-300' : 'bg-slate-100 border border-slate-200/90 text-slate-700']">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-ping"></span>
             <span>{{ currentTimeWIB }}</span>
           </div>
         </div>
@@ -417,12 +433,12 @@
           
           <!-- Healthcare Server Status Badges -->
           <div class="hidden 2xl:flex items-center gap-2">
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-300">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold text-emerald-600 dark:text-emerald-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping"></span>
               <span>DCM4CHEE PACS</span>
             </div>
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[10px] font-bold text-cyan-300">
-              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-[10px] font-bold text-cyan-600 dark:text-cyan-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400"></span>
               <span>SATUSEHAT</span>
             </div>
           </div>
@@ -439,27 +455,27 @@
           <!-- Dark/Light Mode Switcher -->
           <button 
             @click="toggleTheme" 
-            :title="isDark ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'" 
-            class="p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all shadow-sm"
+            :title="isDark ? 'Beralih ke Mode Terang (Slate Clinical)' : 'Beralih ke Mode Gelap (Cosmic)'" 
+            :class="['p-2 rounded-xl transition-all shadow-sm', isDark ? 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200']"
           >
-            <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-700"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             <svg v-else xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           </button>
 
           <!-- Notification Bell -->
-          <div class="relative p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-all cursor-pointer shadow-sm">
+          <div :class="['relative p-2 rounded-xl transition-all cursor-pointer shadow-sm', isDark ? 'text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200']">
             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></span>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full"></span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-500 rounded-full animate-ping"></span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-500 rounded-full"></span>
           </div>
 
-          <div class="w-px h-5 bg-white/10"></div>
+          <div :class="['w-px h-5', isDark ? 'bg-white/10' : 'bg-slate-300']"></div>
 
           <!-- Logout Button -->
           <button 
             @click="logout" 
             title="Keluar dari Akun" 
-            class="flex items-center gap-1.5 py-1.5 px-3 text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-600 rounded-xl border border-rose-500/30 transition-all font-bold text-xs group"
+            :class="['flex items-center gap-1.5 py-1.5 px-3 rounded-xl transition-all font-bold text-xs group', isDark ? 'text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-600 border border-rose-500/30' : 'text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200']"
           >
             <span class="hidden md:inline">Keluar</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-0.5 transition-transform"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -468,30 +484,40 @@
       </header>
 
       <!-- FLOATING WORKSPACE CONTENT CARD -->
-      <div class="flex-1 rounded-3xl bg-slate-900/60 dark:bg-[#070e1d]/70 backdrop-blur-2xl border border-white/10 dark:border-cyan-500/15 shadow-2xl p-4 lg:p-7 overflow-y-auto relative scrollbar-thin">
+      <div :class="[
+        'flex-1 rounded-3xl backdrop-blur-2xl p-4 lg:p-7 overflow-y-auto relative scrollbar-thin transition-all duration-300',
+        isDark 
+          ? 'bg-[#070e1d]/70 border border-cyan-500/15 shadow-2xl text-slate-100' 
+          : 'bg-slate-100/75 border border-slate-200/90 shadow-xl shadow-slate-300/30 text-slate-800'
+      ]">
         
         <!-- Welcome Hero Widget on /admin Root -->
         <div v-if="$route.path === '/admin'" class="animate-in fade-in slide-in-from-bottom-3 duration-500 mb-8">
-          <div class="relative overflow-hidden rounded-3xl p-6 lg:p-8 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-[#070e1d]/90 border border-cyan-500/25 shadow-2xl">
+          <div :class="[
+            'relative overflow-hidden rounded-3xl p-6 lg:p-8 border shadow-xl transition-all',
+            isDark 
+              ? 'bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-[#070e1d]/90 border-cyan-500/25 shadow-2xl' 
+              : 'bg-gradient-to-r from-slate-100/95 via-sky-50/70 to-slate-100/95 border-cyan-500/30'
+          ]">
             <!-- Decorative Ambient Glow in Card -->
             <div class="absolute -right-20 -top-20 w-80 h-80 bg-gradient-to-bl from-cyan-500/20 via-blue-500/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
             <div class="relative z-10 max-w-3xl">
               <div class="flex items-center gap-2 mb-3">
-                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-emerald-500/15 text-emerald-300 text-xs font-black uppercase tracking-wider border border-emerald-500/30">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-black uppercase tracking-wider border border-emerald-500/30">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   Infrastruktur Aktif & Siap Melayani
                 </span>
-                <span class="hidden sm:inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-cyan-500/15 text-cyan-300 text-xs font-black uppercase tracking-wider border border-cyan-500/30">
+                <span class="hidden sm:inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 text-xs font-black uppercase tracking-wider border border-cyan-500/30">
                   ⚡ C-ECHO DICOM OK
                 </span>
               </div>
 
-              <h2 class="text-2xl lg:text-3xl font-black text-white tracking-tight mb-2">
-                Sistem Radiologi Terpadu <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">SmartRIS & PACS</span>
+              <h2 :class="['text-2xl lg:text-3xl font-black tracking-tight mb-2', isDark ? 'text-white' : 'text-slate-900']">
+                Sistem Radiologi Terpadu <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-sky-500 to-blue-600 dark:from-cyan-400 dark:via-sky-300 dark:to-blue-400">SmartRIS & PACS</span>
               </h2>
 
-              <p class="text-slate-300 text-xs lg:text-sm font-medium leading-relaxed mb-6 max-w-2xl">
+              <p :class="['text-xs lg:text-sm font-medium leading-relaxed mb-6 max-w-2xl', isDark ? 'text-slate-300' : 'text-slate-600']">
                 Server DCM4CHEE PACS terkoneksi dengan modality MRI, CT-Scan, dan X-Ray. Modul pembacaan ekspertise klinis, pemantauan waktu tunggu pasien (TAT), serta Gateway SATUSEHAT Kemenkes RI berjalan normal.
               </p>
 
@@ -506,15 +532,15 @@
 
                 <router-link 
                   to="/admin/expertise-worklist" 
-                  class="bg-white/10 hover:bg-white/15 text-white border border-white/10 px-5 py-2.5 rounded-xl font-bold text-xs lg:text-sm shadow-sm transition-all flex items-center gap-2"
+                  :class="['border px-5 py-2.5 rounded-xl font-bold text-xs lg:text-sm shadow-sm transition-all flex items-center gap-2', isDark ? 'bg-white/10 hover:bg-white/15 text-white border-white/10' : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200']"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                   <span>Antrean Ekspertise</span>
                 </router-link>
 
                 <router-link 
                   to="/admin/satusehat" 
-                  class="bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border border-teal-500/30 px-5 py-2.5 rounded-xl font-bold text-xs lg:text-sm shadow-sm transition-all flex items-center gap-2"
+                  :class="['border px-5 py-2.5 rounded-xl font-bold text-xs lg:text-sm shadow-sm transition-all flex items-center gap-2', isDark ? 'bg-teal-500/15 hover:bg-teal-500/25 text-teal-300 border-teal-500/30' : 'bg-teal-50 hover:bg-teal-100 text-teal-800 border-teal-200']"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                   <span>Kemenkes SATUSEHAT</span>
@@ -689,6 +715,10 @@ const logout = () => {
   margin-bottom: 6px;
 }
 
+:global(.dark) .sidebar-group-title {
+  color: #64748b;
+}
+
 .sidebar-link {
   display: flex;
   align-items: center;
@@ -697,23 +727,32 @@ const logout = () => {
   border-radius: 14px;
   font-size: 12.5px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #475569;
   text-decoration: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
+:global(.dark) .sidebar-link {
+  color: #94a3b8;
+}
+
 .sidebar-link:hover {
+  background: rgba(15, 23, 42, 0.05);
+  color: #0f172a;
+  transform: translateX(2px);
+}
+
+:global(.dark) .sidebar-link:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
-  transform: translateX(2px);
 }
 
 .sidebar-icon-box {
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(15, 23, 42, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -721,20 +760,40 @@ const logout = () => {
   transition: all 0.2s ease;
 }
 
+:global(.dark) .sidebar-icon-box {
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .sidebar-link:hover .sidebar-icon-box {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.08);
   transform: scale(1.06);
 }
 
+:global(.dark) .sidebar-link:hover .sidebar-icon-box {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .sidebar-active {
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.14) 0%, rgba(37, 99, 235, 0.08) 100%) !important;
+  color: #0369a1 !important;
+  border: 1px solid rgba(14, 165, 233, 0.35) !important;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.12);
+  font-weight: 700 !important;
+}
+
+:global(.dark) .sidebar-active {
   background: linear-gradient(90deg, rgba(6, 182, 212, 0.22) 0%, rgba(37, 99, 235, 0.12) 100%) !important;
   color: #38bdf8 !important;
   border: 1px solid rgba(56, 189, 248, 0.35) !important;
   box-shadow: 0 4px 15px rgba(6, 182, 212, 0.18);
-  font-weight: 700 !important;
 }
 
 .sidebar-active .sidebar-icon-box {
+  background: rgba(6, 182, 212, 0.16) !important;
+  color: #0284c7 !important;
+}
+
+:global(.dark) .sidebar-active .sidebar-icon-box {
   background: rgba(6, 182, 212, 0.2) !important;
   color: #38bdf8 !important;
 }
@@ -753,19 +812,33 @@ const logout = () => {
   border-radius: 10px;
   font-size: 12px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #64748b;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
+:global(.dark) .sidebar-sub-link {
+  color: #94a3b8;
+}
+
 .sidebar-sub-link:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+:global(.dark) .sidebar-sub-link:hover {
   color: #ffffff;
   background: rgba(255, 255, 255, 0.06);
 }
 
 .sidebar-sub-active {
-  color: #38bdf8 !important;
+  color: #0284c7 !important;
   font-weight: 700 !important;
+  background: rgba(6, 182, 212, 0.12) !important;
+}
+
+:global(.dark) .sidebar-sub-active {
+  color: #38bdf8 !important;
   background: rgba(6, 182, 212, 0.14) !important;
 }
 
@@ -778,10 +851,16 @@ const logout = () => {
   background: transparent;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(100, 116, 139, 0.25);
   border-radius: 9999px;
 }
+:global(.dark) .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(14, 165, 233, 0.45);
+}
+:global(.dark) .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(56, 189, 248, 0.4);
 }
 
