@@ -31,15 +31,12 @@
 ### 3. Workspace Terpadu: OHIF DICOM Viewer & Lembar Ekspertise Dokter
 <img src="docs/screenshots/03_order_detail_expertise.png" alt="Integrated OHIF Viewer and Expertise" width="100%" />
 
-</div>
+<br/><br/>
 
-<details>
-<summary><b>🌐 Bonus: Dashboard Gateway SATUSEHAT Kemenkes RI (FHIR R4)</b></summary>
-<br/>
-<p align="center">
-  <img src="docs/screenshots/04_satusehat_gateway.png" alt="SATUSEHAT Gateway" width="100%" />
-</p>
-</details>
+### 4. Dashboard Gateway SATUSEHAT Kemenkes RI (FHIR R4)
+<img src="docs/screenshots/04_satusehat_gateway.png" alt="SATUSEHAT Gateway" width="100%" />
+
+</div>
 
 ---
 
