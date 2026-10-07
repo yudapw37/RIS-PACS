@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 gap-4">
+  <div class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 gap-4">
     <div class="flex items-center gap-3">
-      <span class="text-xs font-bold text-slate-400 dark:text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tampilkan</span>
+      <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Tampilkan</span>
       <select 
         :value="itemsPerPage" 
         @change="$emit('update:itemsPerPage', Number(($event.target as HTMLSelectElement).value)); $emit('update:currentPage', 1)" 
@@ -12,7 +12,7 @@
         <option :value="50">50</option>
         <option :value="100">100</option>
       </select>
-      <span class="text-sm font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400">dari total <span class="font-bold text-slate-700 dark:text-slate-200">{{ totalItems }}</span> entri</span>
+      <span class="text-sm font-medium text-slate-500 dark:text-slate-400">dari total <span class="font-bold text-slate-700 dark:text-slate-200">{{ totalItems }}</span> entri</span>
     </div>
     
     <div class="flex items-center gap-2">
@@ -24,7 +24,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       
-      <span class="text-sm font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 px-3 flex items-center">
+      <span class="text-sm font-bold text-slate-500 dark:text-slate-400 px-3 flex items-center">
         Hal <span class="mx-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1 min-w-[2rem] text-center shadow-sm dark:shadow-none">{{ currentPage }}</span> / {{ totalPages || 1 }}
       </span>
 

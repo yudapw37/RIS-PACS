@@ -205,7 +205,7 @@
         </div>
 
         <div class="text-xs text-slate-400 font-medium">
-          Menampilkan {{ logs.length }} transaksi terbaru
+          Total {{ logs.length }} transaksi
         </div>
       </div>
 
@@ -235,7 +235,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
-              <tr v-for="log in logs" :key="log.id" class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+              <tr v-for="log in paginatedLogs" :key="log.id" class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
                 
                 <!-- Waktu -->
                 <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400">
@@ -350,25 +350,49 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Logs -->
+        <Pagination 
+          v-if="logs.length > 0"
+          v-model:itemsPerPage="logsItemsPerPage" 
+          v-model:currentPage="logsCurrentPage" 
+          :totalItems="logs.length" 
+        />
       </div>
     </div>
 
     <!-- ── TAB 2: MANAJEMEN ORDER & SINKRONISASI ── -->
     <div v-if="activeTab === 'orders'" class="space-y-4">
-      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm p-6">
-        <div class="flex items-center justify-between mb-4">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="p-6 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800">
           <div>
             <h3 class="font-extrabold text-base text-slate-800 dark:text-slate-100">Daftar Order Radiologi</h3>
             <p class="text-xs text-slate-400 mt-0.5">Kelola dan kirim metadata DICOM + hasil ekspertise ke SATUSEHAT</p>
           </div>
-          <button @click="fetchOrders" class="btn-secondary text-xs flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Muat Ulang Order
-          </button>
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"/></svg>
+              <input 
+                v-model="orderSearch" 
+                type="text" 
+                placeholder="Cari Acc No, Pasien, NIK..." 
+                class="pl-9 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/20 w-56 transition-all"
+              />
+            </div>
+            <button @click="fetchOrders" class="btn-secondary text-xs flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Muat Ulang Order
+            </button>
+          </div>
         </div>
 
         <div v-if="loadingOrders" class="py-16 flex justify-center items-center text-slate-400">
           <svg class="animate-spin w-6 h-6 text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        </div>
+
+        <div v-else-if="filteredOrders.length === 0" class="py-16 text-center text-slate-400 space-y-2">
+          <p class="font-bold text-slate-600 dark:text-slate-300">Tidak ada order radiologi</p>
+          <p class="text-xs">Belum ada order radiologi atau tidak cocok dengan filter pencarian.</p>
         </div>
 
         <div v-else class="overflow-x-auto">
@@ -385,7 +409,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
-              <tr v-for="order in ordersList" :key="order.id" class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+              <tr v-for="order in paginatedOrders" :key="order.id" class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
                 
                 <td class="px-5 py-3.5 whitespace-nowrap">
                   <span class="font-mono text-xs font-black bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded border border-cyan-100 dark:border-cyan-800/50">
@@ -519,6 +543,14 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Orders -->
+        <Pagination 
+          v-if="filteredOrders.length > 0"
+          v-model:itemsPerPage="ordersItemsPerPage" 
+          v-model:currentPage="ordersCurrentPage" 
+          :totalItems="filteredOrders.length" 
+        />
       </div>
     </div>
 
@@ -762,9 +794,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
 import API_BASE from '../config/api'
+import Pagination from '../components/Pagination.vue'
 
 const activeTab = ref<'logs' | 'orders' | 'settings'>('logs')
 
@@ -774,7 +807,7 @@ const stats = reactive<{
   connection?: any;
 }>({})
 
-// Logs State
+// Logs State & Pagination
 const logs = ref<any[]>([])
 const loadingLogs = ref(false)
 const filters = reactive({
@@ -782,14 +815,55 @@ const filters = reactive({
   status: 'all',
   resourceType: 'all',
 })
+const logsCurrentPage = ref(1)
+const logsItemsPerPage = ref(10)
 
-// Orders State
+const paginatedLogs = computed(() => {
+  const start = (logsCurrentPage.value - 1) * logsItemsPerPage.value
+  return logs.value.slice(start, start + logsItemsPerPage.value)
+})
+
+watch(logsItemsPerPage, () => {
+  logsCurrentPage.value = 1
+})
+
+// Orders State & Pagination
 const ordersList = ref<any[]>([])
 const loadingOrders = ref(false)
 const pushingOrderId = ref<number | null>(null)
 const pushingSrId = ref<number | null>(null)
 const editingSrOrderId = ref<number | null>(null)
 const srInputValues = reactive<Record<number, string>>({})
+const orderSearch = ref('')
+const ordersCurrentPage = ref(1)
+const ordersItemsPerPage = ref(10)
+
+const filteredOrders = computed(() => {
+  if (!orderSearch.value.trim()) return ordersList.value
+  const q = orderSearch.value.toLowerCase().trim()
+  return ordersList.value.filter(o => 
+    (o.accessionNumber && o.accessionNumber.toLowerCase().includes(q)) ||
+    (o.patient?.fullName && o.patient.fullName.toLowerCase().includes(q)) ||
+    (o.patient?.mrn && o.patient.mrn.toLowerCase().includes(q)) ||
+    (o.patient?.nik && o.patient.nik.toLowerCase().includes(q)) ||
+    (o.patient?.ihsNumber && o.patient.ihsNumber.toLowerCase().includes(q)) ||
+    (o.modalityTypeCode && o.modalityTypeCode.toLowerCase().includes(q)) ||
+    (o.satusehatServiceRequestId && o.satusehatServiceRequestId.toLowerCase().includes(q))
+  )
+})
+
+const paginatedOrders = computed(() => {
+  const start = (ordersCurrentPage.value - 1) * ordersItemsPerPage.value
+  return filteredOrders.value.slice(start, start + ordersItemsPerPage.value)
+})
+
+watch(orderSearch, () => {
+  ordersCurrentPage.value = 1
+})
+
+watch(ordersItemsPerPage, () => {
+  ordersCurrentPage.value = 1
+})
 
 const startEditSr = (order: any) => {
   editingSrOrderId.value = order.id
@@ -881,12 +955,13 @@ const fetchStats = async () => {
 
 const fetchLogs = async () => {
   loadingLogs.value = true
+  logsCurrentPage.value = 1
   try {
     const params = new URLSearchParams()
     if (filters.status !== 'all') params.append('status', filters.status)
     if (filters.resourceType !== 'all') params.append('resourceType', filters.resourceType)
     if (filters.search) params.append('search', filters.search)
-    params.append('limit', '50')
+    params.append('limit', '200')
 
     const res = await axios.get(`${API_BASE}/api/satusehat/logs?${params.toString()}`)
     if (res.data.success) {
@@ -907,6 +982,7 @@ const debounceFetchLogs = () => {
 
 const fetchOrders = async () => {
   loadingOrders.value = true
+  ordersCurrentPage.value = 1
   try {
     const res = await axios.get(`${API_BASE}/api/orders/all`)
     ordersList.value = Array.isArray(res.data?.data) 
